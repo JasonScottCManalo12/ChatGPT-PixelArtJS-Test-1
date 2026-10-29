@@ -95,7 +95,7 @@
     const filename = sanitizeFilename(filenameInput.value);
     filenameInput.value = filename;
     const config = makeConfiguration(rows, columns, filename);
-    const blob = new Blob([JSON.stringify(config, null, 2) + "\\n"], { type: "application/json;charset=utf-8" });
+    const blob = new Blob([JSON.stringify(config, null, 2) + "\n"], { type: "application/json;charset=utf-8" });
     const objectUrl = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = objectUrl;
