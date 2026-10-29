@@ -80,3 +80,17 @@ h2 { margin: 0; font-size: 1.15rem; letter-spacing: -.02em; }
   .stat span { font-size: .68rem; }
   .stat strong { font-size: 1.15rem; }
 }
+
+.file-name { max-width: 45%; overflow-wrap: anywhere; color: var(--muted); font-size: .8rem; text-align: right; }
+.file-menu { display: flex; flex-wrap: wrap; align-items: stretch; gap: 10px; }
+.file-menu > .button { flex: 1 1 130px; }
+.export-group { display: flex; flex: 1 1 100%; flex-wrap: wrap; align-items: center; gap: 9px; padding: 12px; border: 1px solid var(--line); border-radius: 12px; background: #fafbfe; }
+.export-group label { font-size: .85rem; font-weight: 750; }
+.export-group select { min-height: 42px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 9px; background: #fff; }
+.export-group button { margin-left: auto; }
+.new-canvas-panel { margin-top: 16px; padding: 16px; border: 1px solid var(--line); border-radius: 14px; background: #fbfcff; }
+.new-canvas-panel h3 { margin: 0; font-size: 1rem; }
+.new-canvas-panel > p { margin: 5px 0 14px; }
+.new-canvas-panel .config-form { grid-template-columns: 1fr 1fr; }
+.new-canvas-panel .config-form button { grid-column: auto; }
+[hidden] { display: none !important; }
