@@ -71,30 +71,92 @@
     record(`Array ${array.id} moves its color from position ${previous} outside the canvas.`);
   }
 
-  function returnPendingArrays() {
-    const pending = state.arrays
-      .filter(array => array.returnPending)
-      .sort((a, b) => a.id - b.id);
-
-    if (pending.length === 0) return;
-    record("Trigger: Return value.");
-
-    pending.forEach(array => {
-      const free = firstFreePosition();
-      if (free === null) {
-        record(`Array ${array.id} remains outside: no canvas position is free.`, "condition");
-        return;
-      }
-      moveArray(array, free);
-      record("Trigger: Less than or equal value.");
-    });
+  function activeArrayToProcess() {
+    // Array 1 begins the cycle; subsequent arrays are handled by the same
+    // exceed/return/comparison rules rather than a round-robin click counter.
+    return state.arrays.find(array => array.id === 1) || state.arrays[0] || null;
   }
 
-  function activeArrayToProcess() {
-    // Continue the original cycle with the oldest array while it exists.
-    // Additional arrays do not steal the next click merely because they were
-    // created later; each still uses the same movement/return rules.
-    return state.arrays.find(array => array.id === 1) || state.arrays[0] || null;
+  function highestOtherPosition(array) {
+    return state.arrays
+      .filter(other => other.id !== array.id && other.position !== null)
+      .reduce((highest, other) => Math.max(highest, other.position), -1);
+  }
+
+  function applyLessThanOrEqualRule(array) {
+    record("Trigger: Less than or equal value.", "condition");
+    const target = highestOtherPosition(array) + 1;
+    if (target < LIMIT && !occupiedPositions(array.id).has(target)) {
+      if (array.position !== target) moveArray(array, target);
+      return true;
+    }
+    record(`Array ${array.id} exceeds the available comparison position.`, "condition");
+    moveOutside(array);
+    return false;
+  }
+
+  function settlePendingReturns() {
+    // Newer pending arrays settle first into the remaining positions. Each
+    // return then applies the same comparison rule, without overwriting tiles.
+    let guard = 0;
+    while (state.arrays.some(array => array.returnPending) && guard < LIMIT * (state.arrays.length + 2)) {
+      guard += 1;
+      const pending = state.arrays
+        .filter(array => array.returnPending)
+        .sort((a, b) => b.id - a.id);
+      let progressed = false;
+
+      for (const array of pending) {
+        const free = firstFreePosition();
+        if (free === null) continue;
+        moveArray(array, free);
+        record("Trigger: Return value.");
+        progressed = true;
+
+        if (!applyLessThanOrEqualRule(array)) {
+          // If comparison exceeds the canvas, the array at the last position
+          // also exceeds on this chain. Both become eligible to return.
+          const lastPositionArrays = state.arrays.filter(
+            other => other.id !== array.id && other.position === LIMIT - 1
+          );
+          lastPositionArrays.forEach(moveOutside);
+          if (state.arrays.every(item => item.position === null)) {
+            record("Condition: No array inside canvas.", "condition");
+            record("Trigger: No array? Create.");
+            createArray(0);
+          }
+        }
+      }
+      if (!progressed) break;
+    }
+  }
+
+  function processExceed(array) {
+    record("Trigger: Exceed value.", "condition");
+    moveOutside(array);
+
+    // On exceed, the other visible arrays advance too. Work from the right
+    // edge inward so an array never overwrites the next occupied position.
+    const others = state.arrays
+      .filter(other => other.id !== array.id && other.position !== null)
+      .sort((a, b) => b.position - a.position);
+    others.forEach(other => {
+      const next = other.position + 1;
+      if (next >= LIMIT || occupiedPositions(other.id).has(next)) {
+        moveOutside(other);
+        record(`Array ${other.id} exceeds while advancing.`, "condition");
+      } else {
+        moveArray(other, next);
+      }
+    });
+
+    if (state.arrays.every(item => item.position === null)) {
+      record("Condition: No array inside canvas.", "condition");
+      record("Trigger: No array? Create.");
+      createArray(0);
+    }
+
+    settlePendingReturns();
   }
 
   function advanceCycle() {
@@ -120,14 +182,8 @@
 
     if (array.position === null) {
       record(`Array ${array.id} is outside; evaluate its return.`, "condition");
-      const free = firstFreePosition();
-      if (free === null) {
-        record(`Array ${array.id} remains outside: no canvas position is free.`, "condition");
-        array.returnPending = true;
-      } else {
-        moveArray(array, free);
-        record("Trigger: Less than or equal value.");
-      }
+      array.returnPending = true;
+      settlePendingReturns();
     } else {
       const next = array.position + 1;
       const occupied = occupiedPositions(array.id);
@@ -140,24 +196,10 @@
             : `Condition: position ${next} is occupied.`,
           "condition"
         );
-        moveOutside(array);
-        record("Trigger: Exceed value.");
+        processExceed(array);
       }
     }
 
-    // Returns are processed after the current array's movement. Occupied
-    // positions are never overwritten, and the cycle driver is never fixed
-    // to a rotating turn counter.
-    // Create the next array before processing returns. Otherwise the last
-    // array could immediately return to the empty canvas and prevent creation
-    // from ever triggering.
-    if (state.arrays.every(item => item.position === null)) {
-      record("Condition: No array inside canvas.", "condition");
-      record("Trigger: No array? Create.");
-      createArray(0);
-    }
-
-    returnPendingArrays();
     render();
   }
 
