@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111827">
+  <title>Array Canvas Simulator</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <main class="app">
+    <header class="app-header">
+      <p class="eyebrow">HTML · CSS · JavaScript</p>
+      <h1>Array Canvas Simulator</h1>
+      <p class="intro">One click, one rule cycle. Watch arrays move, return, compare, and get created.</p>
+    </header>
+
+    <section class="panel" aria-labelledby="canvas-title">
+      <div class="section-heading">
+        <div>
+          <h2 id="canvas-title">Canvas</h2>
+          <p class="muted">Four positions · one array per position</p>
+        </div>
+        <span id="click-count" class="counter">Click 0</span>
+      </div>
+
+      <div id="canvas-grid" class="canvas-grid" aria-live="polite">
+        <div class="canvas-cell empty" data-position="0"><span class="position">0</span><span class="occupant">White · Empty</span></div>
+        <div class="canvas-cell empty" data-position="1"><span class="position">1</span><span class="occupant">White · Empty</span></div>
+        <div class="canvas-cell empty" data-position="2"><span class="position">2</span><span class="occupant">White · Empty</span></div>
+        <div class="canvas-cell empty" data-position="3"><span class="position">3</span><span class="occupant">White · Empty</span></div>
+      </div>
+
+      <div class="controls">
+        <button id="generate-button" class="button primary" type="button">Generate · Next Click</button>
+        <button id="reset-button" class="button secondary" type="button">Reset</button>
+      </div>
+      <p class="hint">Starts empty. Reset clears the arrays, click count, and event log.</p>
+    </section>
+
+    <section class="panel" aria-labelledby="state-title">
+      <h2 id="state-title">State</h2>
+      <div class="stats">
+        <div class="stat"><span class="muted">Arrays created</span><strong id="array-count">0</strong></div>
+        <div class="stat"><span class="muted">On canvas</span><strong id="visible-count">0 / 4</strong></div>
+        <div class="stat"><span class="muted">Outside / pending</span><strong id="outside-count">0</strong></div>
+      </div>
+      <div id="array-list" class="array-list"><p class="muted">No arrays created yet.</p></div>
+    </section>
+
+    <section class="panel" aria-labelledby="log-title">
+      <div class="section-heading">
+        <div>
+          <h2 id="log-title">Event log</h2>
+          <p class="muted">Conditions and triggered actions are recorded separately.</p>
+        </div>
+        <button id="clear-log-button" class="button text-button" type="button">Clear log</button>
+      </div>
+      <ol id="event-log" class="event-log" aria-live="polite">
+        <li class="log-note">Ready. Canvas is empty.</li>
+      </ol>
+    </section>
+
+    <footer class="footer">Prototype · shared rules for every array · no external libraries</footer>
+  </main>
+</body>
+</html>
