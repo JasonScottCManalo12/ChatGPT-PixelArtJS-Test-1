@@ -5,6 +5,7 @@
   const state = {
     clickCount: 0,
     nextId: 1,
+    nextTurnId: 1,
     arrays: [],
     log: []
   };
@@ -24,10 +25,10 @@
     state.log.push({ message, kind, click: state.clickCount });
   }
 
-  function occupiedPositions() {
+  function occupiedPositions(exceptId = null) {
     return new Set(
       state.arrays
-        .filter(array => Number.isInteger(array.position))
+        .filter(array => array.position !== null && array.id !== exceptId)
         .map(array => array.position)
     );
   }
@@ -42,12 +43,11 @@
 
   function createArray(position = null) {
     const array = {
-      id: state.nextId,
+      id: state.nextId++,
       value: 0,
       position,
       returnPending: position === null
     };
-    state.nextId += 1;
     state.arrays.push(array);
     record(`Array ${array.id} created.`);
     if (position !== null) {
@@ -72,33 +72,14 @@
     record(`Array ${array.id} moves its color from position ${previous} outside the canvas.`);
   }
 
-  // Shared comparison rule: newer arrays are placed first, then older arrays.
-  // Each array is processed by the same rule; no array-specific branches.
-  function applyLessThanOrEqualMovement() {
-    record("Condition: Less than or equal value? Evaluate array order.", "condition");
-    const ordered = [...state.arrays].sort((a, b) => b.id - a.id);
-    const targetPositions = [0, 1, 2, 3];
-
-    ordered.forEach((array, index) => {
-      const target = targetPositions[index];
-      if (target === undefined) {
-        if (array.position !== null) moveOutside(array);
-        return;
-      }
-      if (array.position !== target) {
-        moveArray(array, target);
-      }
-    });
-  }
-
-  function processReturns() {
+  function returnPendingArrays() {
     const pending = state.arrays
       .filter(array => array.returnPending)
-      .sort((a, b) => b.id - a.id);
+      .sort((a, b) => a.id - b.id);
 
     if (pending.length === 0) return;
-
     record("Trigger: Return value.");
+
     pending.forEach(array => {
       const free = firstFreePosition();
       if (free === null) {
@@ -107,52 +88,79 @@
       }
       moveArray(array, free);
       record("Trigger: Less than or equal value.");
-      applyLessThanOrEqualMovement();
     });
+  }
+
+  function nextArrayToProcess() {
+    if (state.arrays.length === 0) return null;
+
+    // Round-robin scheduling: every array uses the same rules.
+    const ordered = [...state.arrays].sort((a, b) => a.id - b.id);
+    let selected = ordered.find(array => array.id >= state.nextTurnId);
+    if (!selected) selected = ordered[0];
+    state.nextTurnId = selected.id + 1;
+    return selected;
   }
 
   function advanceCycle() {
     state.clickCount += 1;
     record(`User clicks Generate (click ${state.clickCount}).`, "note");
 
-    if (state.arrays.length === 0) {
+    if (state.arrays.length === 0 || state.arrays.every(array => array.position === null)) {
       record("Condition: No array inside canvas.", "condition");
       record("Trigger: No array? Create.");
-      createArray(0);
+      createArray(firstFreePosition() ?? 0);
       render();
       return;
     }
 
-    // The oldest array is the repeating driver. The rule set below is shared
-    // by every array when it needs to return or be repositioned.
-    const driver = state.arrays.find(array => array.id === 1) || state.arrays[0];
-    driver.value += 1;
-    record(`Array ${driver.id} increments its value to ${driver.value}.`);
-
-    if (driver.position === null) {
-      record(`Array ${driver.id} is outside; its return is pending.`, "condition");
-    } else if (driver.position < LIMIT - 1) {
-      const next = driver.position + 1;
-      const occupant = state.arrays.find(array => array.position === next && array.id !== driver.id);
-      if (!occupant) {
-        moveArray(driver, next);
-      } else {
-        record(`Condition: position ${next} is occupied by Array ${occupant.id}.`, "condition");
-        moveOutside(driver);
-        record("Trigger: Exceed value.");
-      }
-    } else {
-      moveOutside(driver);
-      record("Trigger: Exceed value.");
+    const array = nextArrayToProcess();
+    if (!array) {
+      render();
+      return;
     }
 
-    if (state.arrays.every(array => array.position === null)) {
+    array.value += 1;
+    record(`Array ${array.id} increments its value to ${array.value}.`);
+
+    if (array.position === null) {
+      record(`Array ${array.id} is outside; evaluate its return.`, "condition");
+      const free = firstFreePosition();
+      if (free === null) {
+        record(`Array ${array.id} remains outside: no canvas position is free.`, "condition");
+        array.returnPending = true;
+      } else {
+        moveArray(array, free);
+        record("Trigger: Less than or equal value.");
+      }
+    } else {
+      const next = array.position + 1;
+      const occupied = occupiedPositions(array.id);
+      if (next < LIMIT && !occupied.has(next)) {
+        moveArray(array, next);
+      } else {
+        record(
+          next >= LIMIT
+            ? `Condition: Array ${array.id} exceeds the final position.`
+            : `Condition: position ${next} is occupied.`,
+          "condition"
+        );
+        moveOutside(array);
+        record("Trigger: Exceed value.");
+      }
+    }
+
+    // Returns are processed after the current array's movement. Occupied
+    // positions are never overwritten, and the cycle driver is never fixed
+    // to Array 1.
+    returnPendingArrays();
+
+    if (state.arrays.every(item => item.position === null)) {
       record("Condition: No array inside canvas.", "condition");
       record("Trigger: No array? Create.");
       createArray(0);
     }
 
-    processReturns();
     render();
   }
 
@@ -234,6 +242,7 @@
   function reset() {
     state.clickCount = 0;
     state.nextId = 1;
+    state.nextTurnId = 1;
     state.arrays = [];
     state.log = [{ message: "Ready. Canvas is empty.", kind: "note", click: 0 }];
     render();
