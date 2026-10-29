@@ -1,0 +1,24 @@
+{
+  "format": "hanoi-of-colors-simulation",
+  "formatVersion": 1,
+  "filename": "hanoi-3x3.json",
+  "dimensions": {
+    "rows": 3,
+    "columns": 3
+  },
+  "positions": 9,
+  "indexing": "zero-based row-major; position = row * columns + column",
+  "occupancySequence": {
+    "order": "increasing occupied-position count, then lexicographic position combinations",
+    "totalStates": 512,
+    "initialState": {
+      "step": 0,
+      "array_elements": []
+    }
+  },
+  "canvas": {
+    "initialBackground": "white",
+    "occupiedBackground": "black",
+    "initialArrayElements": []
+  }
+}
