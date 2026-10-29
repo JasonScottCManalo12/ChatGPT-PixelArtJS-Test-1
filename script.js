@@ -2,13 +2,15 @@
   "use strict";
 
   const LIMIT = 4;
-  const state = {
-    clickCount: 0,
-    nextId: 1,
-    arrays: [],
-    log: []
-  };
+  // Exact occupied-position sequence supplied by the user.
+  const ARRAY_ELEMENT_SEQUENCE = [
+    [], [0], [1], [2], [3],
+    [0, 1], [0, 2], [0, 3], [1, 2], [1, 3], [2, 3],
+    [0, 1, 2], [0, 1, 3], [0, 2, 3], [1, 2, 3],
+    [0, 1, 2, 3]
+  ];
 
+  const state = { clickCount: 0, array_elements: [], log: [] };
   const grid = document.querySelector("#canvas-grid");
   const clickCounter = document.querySelector("#click-count");
   const arrayCount = document.querySelector("#array-count");
@@ -24,226 +26,65 @@
     state.log.push({ message, kind, click: state.clickCount });
   }
 
-  function occupiedPositions(exceptId = null) {
-    return new Set(
-      state.arrays
-        .filter(array => array.position !== null && array.id !== exceptId)
-        .map(array => array.position)
-    );
-  }
-
-  function firstFreePosition() {
-    const occupied = occupiedPositions();
-    for (let position = 0; position < LIMIT; position += 1) {
-      if (!occupied.has(position)) return position;
+  function applySequenceStep() {
+    state.array_elements = [...ARRAY_ELEMENT_SEQUENCE[state.clickCount]];
+    record(`array_elements = [${state.array_elements.join(",")}]`);
+    if (state.clickCount === ARRAY_ELEMENT_SEQUENCE.length - 1) {
+      record("Sequence complete: all four positions are occupied.", "condition");
     }
-    return null;
-  }
-
-  function createArray(position = null) {
-    const array = {
-      id: state.nextId++,
-      value: 0,
-      position,
-      returnPending: position === null
-    };
-    state.arrays.push(array);
-    record(`Array ${array.id} created.`);
-    if (position !== null) {
-      record(`Array ${array.id} positions its color at canvas position ${position}.`);
-    }
-    return array;
-  }
-
-  function moveArray(array, position) {
-    const previous = array.position;
-    array.position = position;
-    array.returnPending = false;
-    const origin = previous === null ? "outside the canvas" : `position ${previous}`;
-    record(`Array ${array.id} moves from ${origin} to canvas position ${position}.`);
-  }
-
-  function moveOutside(array) {
-    if (array.position === null) return;
-    const previous = array.position;
-    array.position = null;
-    array.returnPending = true;
-    record(`Array ${array.id} moves its color from position ${previous} outside the canvas.`);
-  }
-
-  function activeArrayToProcess() {
-    // Array 1 begins the cycle; subsequent arrays are handled by the same
-    // exceed/return/comparison rules rather than a round-robin click counter.
-    return state.arrays.find(array => array.id === 1) || state.arrays[0] || null;
-  }
-
-  function highestOtherPosition(array) {
-    return state.arrays
-      .filter(other => other.id !== array.id && other.position !== null)
-      .reduce((highest, other) => Math.max(highest, other.position), -1);
-  }
-
-  function applyLessThanOrEqualRule(array) {
-    record("Trigger: Less than or equal value.", "condition");
-    const target = highestOtherPosition(array) + 1;
-    if (target < LIMIT && !occupiedPositions(array.id).has(target)) {
-      if (array.position !== target) moveArray(array, target);
-      return true;
-    }
-    record(`Array ${array.id} exceeds the available comparison position.`, "condition");
-    moveOutside(array);
-    return false;
-  }
-
-  function settlePendingReturns() {
-    // Newer pending arrays settle first into the remaining positions. Each
-    // return then applies the same comparison rule, without overwriting tiles.
-    let guard = 0;
-    while (state.arrays.some(array => array.returnPending) && guard < LIMIT * (state.arrays.length + 2)) {
-      guard += 1;
-      const pending = state.arrays
-        .filter(array => array.returnPending)
-        .sort((a, b) => b.id - a.id);
-      let progressed = false;
-
-      for (const array of pending) {
-        const free = firstFreePosition();
-        if (free === null) continue;
-        moveArray(array, free);
-        record("Trigger: Return value.");
-        progressed = true;
-
-        if (!applyLessThanOrEqualRule(array)) {
-          // If comparison exceeds the canvas, the array at the last position
-          // also exceeds on this chain. Both become eligible to return.
-          const lastPositionArrays = state.arrays.filter(
-            other => other.id !== array.id && other.position === LIMIT - 1
-          );
-          lastPositionArrays.forEach(moveOutside);
-          if (state.arrays.every(item => item.position === null)) {
-            record("Condition: No array inside canvas.", "condition");
-            record("Trigger: No array? Create.");
-            createArray(0);
-          }
-        }
-      }
-      if (!progressed) break;
-    }
-  }
-
-  function processExceed(array) {
-    record("Trigger: Exceed value.", "condition");
-    moveOutside(array);
-
-    // On exceed, the other visible arrays advance too. Work from the right
-    // edge inward so an array never overwrites the next occupied position.
-    const others = state.arrays
-      .filter(other => other.id !== array.id && other.position !== null)
-      .sort((a, b) => b.position - a.position);
-    others.forEach(other => {
-      const next = other.position + 1;
-      if (next >= LIMIT || occupiedPositions(other.id).has(next)) {
-        moveOutside(other);
-        record(`Array ${other.id} exceeds while advancing.`, "condition");
-      } else {
-        moveArray(other, next);
-      }
-    });
-
-    if (state.arrays.every(item => item.position === null)) {
-      record("Condition: No array inside canvas.", "condition");
-      record("Trigger: No array? Create.");
-      createArray(0);
-    }
-
-    settlePendingReturns();
   }
 
   function advanceCycle() {
+    if (state.clickCount >= ARRAY_ELEMENT_SEQUENCE.length - 1) {
+      record("Sequence is complete. Press Reset to start again.", "condition");
+      render();
+      return;
+    }
     state.clickCount += 1;
-    record(`User clicks Generate (click ${state.clickCount}).`, "note");
-
-    if (state.arrays.length === 0 || state.arrays.every(array => array.position === null)) {
-      record("Condition: No array inside canvas.", "condition");
-      record("Trigger: No array? Create.");
-      createArray(firstFreePosition() ?? 0);
-      render();
-      return;
-    }
-
-    const array = activeArrayToProcess();
-    if (!array) {
-      render();
-      return;
-    }
-
-    array.value += 1;
-    record(`Array ${array.id} increments its value to ${array.value}.`);
-
-    if (array.position === null) {
-      record(`Array ${array.id} is outside; evaluate its return.`, "condition");
-      array.returnPending = true;
-      settlePendingReturns();
-    } else {
-      const next = array.position + 1;
-      const occupied = occupiedPositions(array.id);
-      if (next < LIMIT && !occupied.has(next)) {
-        moveArray(array, next);
-      } else {
-        record(
-          next >= LIMIT
-            ? `Condition: Array ${array.id} exceeds the final position.`
-            : `Condition: position ${next} is occupied.`,
-          "condition"
-        );
-        processExceed(array);
-      }
-    }
-
+    applySequenceStep();
     render();
   }
 
   function renderCanvas() {
+    const occupied = new Set(state.array_elements);
     grid.replaceChildren();
     for (let position = 0; position < LIMIT; position += 1) {
-      const occupant = state.arrays.find(array => array.position === position);
+      const isOccupied = occupied.has(position);
       const cell = document.createElement("div");
-      cell.className = `canvas-cell ${occupant ? "occupied" : "empty"}`;
+      cell.className = `canvas-cell ${isOccupied ? "occupied" : "empty"}`;
       cell.dataset.position = String(position);
-
       const positionLabel = document.createElement("span");
       positionLabel.className = "position";
       positionLabel.textContent = String(position);
       const occupantLabel = document.createElement("span");
       occupantLabel.className = "occupant";
-      occupantLabel.textContent = occupant ? `Array ${occupant.id}` : "White · Empty";
+      occupantLabel.textContent = isOccupied ? `Array element ${position}` : "White · Empty";
       cell.append(positionLabel, occupantLabel);
-
-      if (occupant) {
-        const valueLabel = document.createElement("span");
-        valueLabel.className = "value";
-        valueLabel.textContent = `Value: ${occupant.value}`;
-        cell.append(valueLabel);
-      }
       grid.append(cell);
     }
   }
 
   function renderArrayList() {
-    if (state.arrays.length === 0) {
-      arrayList.innerHTML = '<p class="muted">No arrays created yet.</p>';
+    arrayList.replaceChildren();
+    if (state.array_elements.length === 0) {
+      const empty = document.createElement("p");
+      empty.className = "muted";
+      empty.textContent = "array_elements is empty.";
+      arrayList.append(empty);
       return;
     }
-
-    arrayList.replaceChildren();
-    [...state.arrays].sort((a, b) => a.id - b.id).forEach(array => {
+    const label = document.createElement("p");
+    label.className = "detail";
+    label.textContent = `array_elements = [${state.array_elements.join(",")}]`;
+    arrayList.append(label);
+    state.array_elements.forEach(position => {
       const row = document.createElement("div");
       row.className = "array-row";
       const name = document.createElement("strong");
-      name.textContent = `Array ${array.id}`;
+      name.textContent = `Position ${position}`;
       const detail = document.createElement("span");
       detail.className = "detail";
-      detail.textContent = `Value: ${array.value} · ${array.position === null ? "Outside" : `Position ${array.position}`}${array.returnPending ? " · Return pending" : ""}`;
+      detail.textContent = "Occupied";
       row.append(name, detail);
       arrayList.append(row);
     });
@@ -259,7 +100,6 @@
       eventLog.append(item);
       return;
     }
-
     recent.forEach(entry => {
       const item = document.createElement("li");
       item.className = entry.kind;
@@ -269,10 +109,10 @@
   }
 
   function render() {
-    clickCounter.textContent = `Click ${state.clickCount}`;
-    arrayCount.textContent = String(state.arrays.length);
-    visibleCount.textContent = `${state.arrays.filter(array => array.position !== null).length} / ${LIMIT}`;
-    outsideCount.textContent = String(state.arrays.filter(array => array.position === null).length);
+    clickCounter.textContent = `Step ${state.clickCount} / ${ARRAY_ELEMENT_SEQUENCE.length - 1}`;
+    arrayCount.textContent = String(state.array_elements.length);
+    visibleCount.textContent = `${state.array_elements.length} / ${LIMIT}`;
+    outsideCount.textContent = String(LIMIT - state.array_elements.length);
     renderCanvas();
     renderArrayList();
     renderLog();
@@ -280,9 +120,8 @@
 
   function reset() {
     state.clickCount = 0;
-    state.nextId = 1;
-    state.arrays = [];
-    state.log = [{ message: "Ready. Canvas is empty.", kind: "note", click: 0 }];
+    state.array_elements = [];
+    state.log = [{ message: "Ready. array_elements = [].", kind: "note", click: 0 }];
     render();
   }
 
