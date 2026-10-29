@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#111827">
-  <title>Array Canvas Simulator</title>
+  <title>Hanoi of Colors</title>
   <link rel="stylesheet" href="style.css">
   <script src="script.js" defer></script>
 </head>
@@ -12,57 +12,74 @@
   <main class="app">
     <header class="app-header">
       <p class="eyebrow">HTML · CSS · JavaScript</p>
-      <h1>Array Canvas Simulator</h1>
-      <p class="intro">One click, one rule cycle. Watch arrays move, return, compare, and get created.</p>
+      <h1>Hanoi of Colors</h1>
+      <p class="intro">Create a grid configuration, then explore occupancy states in increasing order of occupied positions.</p>
     </header>
+
+    <section class="panel" aria-labelledby="file-title">
+      <div class="section-heading">
+        <div>
+          <h2 id="file-title">Create File</h2>
+          <p class="muted">Choose the canvas dimensions and export a JSON simulation configuration.</p>
+        </div>
+      </div>
+      <form id="config-form" class="config-form">
+        <label>Rows
+          <input id="rows-input" name="rows" type="number" min="1" max="5" value="3" required>
+        </label>
+        <label>Columns
+          <input id="columns-input" name="columns" type="number" min="1" max="5" value="3" required>
+        </label>
+        <label class="filename-field">Filename
+          <input id="filename-input" name="filename" type="text" value="hanoi-3x3.json" required>
+        </label>
+        <p id="config-summary" class="config-summary">3 × 3 grid · 9 positions · 512 possible occupancy states</p>
+        <button id="create-file-button" class="button primary" type="submit">Create File · Download JSON</button>
+      </form>
+      <p class="hint">Creates a downloadable configuration file with the selected dimensions and an empty initial canvas. The browser cannot commit files directly to GitHub.</p>
+      <p id="file-status" class="status" role="status" aria-live="polite">Ready to create hanoi-3x3.json.</p>
+    </section>
 
     <section class="panel" aria-labelledby="canvas-title">
       <div class="section-heading">
         <div>
           <h2 id="canvas-title">Canvas</h2>
-          <p class="muted">Four positions · one array per position</p>
+          <p id="canvas-description" class="muted">3 rows × 3 columns · 9 positions</p>
         </div>
-        <span id="click-count" class="counter">Click 0</span>
+        <span id="click-count" class="counter">Step 0</span>
       </div>
 
-      <div id="canvas-grid" class="canvas-grid" aria-live="polite">
-        <div class="canvas-cell empty" data-position="0"><span class="position">0</span><span class="occupant">White · Empty</span></div>
-        <div class="canvas-cell empty" data-position="1"><span class="position">1</span><span class="occupant">White · Empty</span></div>
-        <div class="canvas-cell empty" data-position="2"><span class="position">2</span><span class="occupant">White · Empty</span></div>
-        <div class="canvas-cell empty" data-position="3"><span class="position">3</span><span class="occupant">White · Empty</span></div>
-      </div>
+      <div id="canvas-grid" class="canvas-grid" aria-live="polite"></div>
 
       <div class="controls">
-        <button id="generate-button" class="button primary" type="button">Generate · Next Click</button>
+        <button id="generate-button" class="button primary" type="button">Generate · Next State</button>
         <button id="reset-button" class="button secondary" type="button">Reset</button>
       </div>
-      <p class="hint">Starts empty. Reset clears the arrays, click count, and event log.</p>
+      <p class="hint">The occupancy order is empty, then all one-position states, two-position states, and so on. Reset returns to an empty canvas.</p>
     </section>
 
     <section class="panel" aria-labelledby="state-title">
       <h2 id="state-title">State</h2>
       <div class="stats">
-        <div class="stat"><span class="muted">Arrays created</span><strong id="array-count">0</strong></div>
-        <div class="stat"><span class="muted">On canvas</span><strong id="visible-count">0 / 4</strong></div>
-        <div class="stat"><span class="muted">Outside / pending</span><strong id="outside-count">0</strong></div>
+        <div class="stat"><span class="muted">Occupied positions</span><strong id="array-count">0</strong></div>
+        <div class="stat"><span class="muted">On canvas</span><strong id="visible-count">0 / 9</strong></div>
+        <div class="stat"><span class="muted">Empty positions</span><strong id="outside-count">9</strong></div>
       </div>
-      <div id="array-list" class="array-list"><p class="muted">No arrays created yet.</p></div>
+      <div id="array-list" class="array-list"><p class="muted">array_elements is empty.</p></div>
     </section>
 
     <section class="panel" aria-labelledby="log-title">
       <div class="section-heading">
         <div>
           <h2 id="log-title">Event log</h2>
-          <p class="muted">Conditions and triggered actions are recorded separately.</p>
+          <p class="muted">Configuration and state changes are recorded here.</p>
         </div>
         <button id="clear-log-button" class="button text-button" type="button">Clear log</button>
       </div>
-      <ol id="event-log" class="event-log" aria-live="polite">
-        <li class="log-note">Ready. Canvas is empty.</li>
-      </ol>
+      <ol id="event-log" class="event-log" aria-live="polite"></ol>
     </section>
 
-    <footer class="footer">Prototype · shared rules for every array · no external libraries</footer>
+    <footer class="footer">Hanoi of Colors · JSON configuration · no external libraries</footer>
   </main>
 </body>
 </html>
