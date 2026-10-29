@@ -153,14 +153,16 @@
     // Returns are processed after the current array's movement. Occupied
     // positions are never overwritten, and the cycle driver is never fixed
     // to Array 1.
-    returnPendingArrays();
-
+    // Create the next array before processing returns. Otherwise the last
+    // array could immediately return to the empty canvas and prevent creation
+    // from ever triggering.
     if (state.arrays.every(item => item.position === null)) {
       record("Condition: No array inside canvas.", "condition");
       record("Trigger: No array? Create.");
       createArray(0);
     }
 
+    returnPendingArrays();
     render();
   }
 
