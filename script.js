@@ -153,7 +153,6 @@
     }
 
     processReturns();
-    applyLessThanOrEqualMovement();
     render();
   }
 
