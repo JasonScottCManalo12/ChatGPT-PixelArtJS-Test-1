@@ -5,7 +5,6 @@
   const state = {
     clickCount: 0,
     nextId: 1,
-    nextTurnId: 1,
     arrays: [],
     log: []
   };
@@ -91,15 +90,11 @@
     });
   }
 
-  function nextArrayToProcess() {
-    if (state.arrays.length === 0) return null;
-
-    // Round-robin scheduling: every array uses the same rules.
-    const ordered = [...state.arrays].sort((a, b) => a.id - b.id);
-    let selected = ordered.find(array => array.id >= state.nextTurnId);
-    if (!selected) selected = ordered[0];
-    state.nextTurnId = selected.id + 1;
-    return selected;
+  function activeArrayToProcess() {
+    // Continue the original cycle with the oldest array while it exists.
+    // Additional arrays do not steal the next click merely because they were
+    // created later; each still uses the same movement/return rules.
+    return state.arrays.find(array => array.id === 1) || state.arrays[0] || null;
   }
 
   function advanceCycle() {
@@ -114,7 +109,7 @@
       return;
     }
 
-    const array = nextArrayToProcess();
+    const array = activeArrayToProcess();
     if (!array) {
       render();
       return;
@@ -152,7 +147,7 @@
 
     // Returns are processed after the current array's movement. Occupied
     // positions are never overwritten, and the cycle driver is never fixed
-    // to Array 1.
+    // to a rotating turn counter.
     // Create the next array before processing returns. Otherwise the last
     // array could immediately return to the empty canvas and prevent creation
     // from ever triggering.
@@ -244,7 +239,6 @@
   function reset() {
     state.clickCount = 0;
     state.nextId = 1;
-    state.nextTurnId = 1;
     state.arrays = [];
     state.log = [{ message: "Ready. Canvas is empty.", kind: "note", click: 0 }];
     render();
