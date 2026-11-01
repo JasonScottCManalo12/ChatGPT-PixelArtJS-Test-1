@@ -48,9 +48,7 @@
         </div>
         <span id="click-count" class="counter">Step 0</span>
       </div>
-
       <div id="canvas-grid" class="canvas-grid" aria-live="polite"></div>
-
       <div class="controls">
         <button id="generate-button" class="button primary" type="button">Generate · Next State</button>
         <button id="reset-button" class="button secondary" type="button">Reset</button>
@@ -68,6 +66,38 @@
       <div id="array-list" class="array-list"><p class="muted">array_elements is empty.</p></div>
     </section>
 
+    <section class="panel visual-benchmark" aria-labelledby="visual-test-title">
+      <div class="section-heading">
+        <div>
+          <h2 id="visual-test-title">Visual Experiment · Coordinate Placement vs Array Relocation</h2>
+          <p class="muted">Run both methods in this browser and compare their resulting grids.</p>
+        </div>
+      </div>
+      <div class="visual-test-controls">
+        <label>Rows <input id="visual-rows" type="number" min="1" max="10" value="3"></label>
+        <label>Columns <input id="visual-columns" type="number" min="1" max="10" value="3"></label>
+        <button id="visual-run" class="button primary" type="button">Run Visual Test</button>
+      </div>
+      <p class="hint">Each cell shows the value assigned to its row/column coordinate. Both methods receive the same entries. Timing is measured in this browser and is informational only.</p>
+      <div class="visual-comparison">
+        <div class="visual-method">
+          <h3>Method A · Arithmetic placement</h3>
+          <p id="visual-arithmetic-time" class="visual-time">Not run yet</p>
+          <div id="visual-arithmetic-grid" class="result-grid" aria-label="Arithmetic placement result"></div>
+        </div>
+        <div class="visual-method">
+          <h3>Method B · Array relocation</h3>
+          <p id="visual-relocation-time" class="visual-time">Not run yet</p>
+          <div id="visual-relocation-grid" class="result-grid" aria-label="Array relocation result"></div>
+        </div>
+      </div>
+      <p id="visual-verdict" class="visual-verdict" role="status" aria-live="polite">Ready. Run the test to compare the two outputs.</p>
+      <details class="visual-details">
+        <summary>What is being tested?</summary>
+        <p>Method A writes each value directly to row × columns + column in a preallocated array. Method B inserts each value at that index using Array.splice(), which may shift existing elements. This is a focused comparison, not yet a reproduction of the original PixelArtJS three-computation sequence or its ImageData rendering.</p>
+      </details>
+    </section>
+
     <section class="panel" aria-labelledby="log-title">
       <div class="section-heading">
         <div>
@@ -78,7 +108,6 @@
       </div>
       <ol id="event-log" class="event-log" aria-live="polite"></ol>
     </section>
-
     <footer class="footer">Hanoi of Colors · JSON configuration · no external libraries</footer>
   </main>
 </body>
