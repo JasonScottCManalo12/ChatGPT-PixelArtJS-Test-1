@@ -40,22 +40,6 @@
       <p id="file-status" class="status" role="status" aria-live="polite">Ready to create hanoi-3x3.json.</p>
     </section>
 
-    <section class="panel" aria-labelledby="canvas-title">
-      <div class="section-heading">
-        <div>
-          <h2 id="canvas-title">Canvas</h2>
-          <p id="canvas-description" class="muted">3 rows × 3 columns · 9 positions</p>
-        </div>
-        <span id="click-count" class="counter">Step 0</span>
-      </div>
-      <div id="canvas-grid" class="canvas-grid" aria-live="polite"></div>
-      <div class="controls">
-        <button id="generate-button" class="button primary" type="button">Generate · Next State</button>
-        <button id="reset-button" class="button secondary" type="button">Reset</button>
-      </div>
-      <p class="hint">The occupancy order is empty, then all one-position states, two-position states, and so on. Reset returns to an empty canvas.</p>
-    </section>
-
     <section class="panel" aria-labelledby="state-title">
       <h2 id="state-title">State</h2>
       <div class="stats">
@@ -96,6 +80,23 @@
         <summary>What is being tested?</summary>
         <p>Method A writes each value directly to row × columns + column in a preallocated array. Method B inserts each value at that index using Array.splice(), which may shift existing elements. This is a focused comparison, not yet a reproduction of the original PixelArtJS three-computation sequence or its ImageData rendering.</p>
       </details>
+    </section>
+
+
+    <section class="panel" aria-labelledby="canvas-title">
+      <div class="section-heading">
+        <div>
+          <h2 id="canvas-title">Canvas</h2>
+          <p id="canvas-description" class="muted">3 rows × 3 columns · 9 positions</p>
+        </div>
+        <span id="click-count" class="counter">Step 0</span>
+      </div>
+      <div id="canvas-grid" class="canvas-grid" aria-live="polite"></div>
+      <div class="controls">
+        <button id="generate-button" class="button primary" type="button">Generate · Next State</button>
+        <button id="reset-button" class="button secondary" type="button">Reset</button>
+      </div>
+      <p class="hint">The occupancy order is empty, then all one-position states, two-position states, and so on. Reset returns to an empty canvas.</p>
     </section>
 
     <section class="panel" aria-labelledby="log-title">
