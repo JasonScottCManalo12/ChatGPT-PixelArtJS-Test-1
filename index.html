@@ -31,7 +31,7 @@ footer{text-align:center;color:#71839a;font-size:11px;margin-top:25px}
 <section class="panel"><div class="panel-head"><div><h2>Pixel canvas</h2><p class="muted">Live view of the current occupancy array.</p></div><span class="tag" id="status">EMPTY STATE</span></div>
 <div class="canvas-wrap"><div id="grid" role="img" aria-label="3 by 3 pixel grid"></div></div>
 <p class="muted" id="dimensions">3 rows × 3 columns · 9 positions</p>
-<div class="actions"><button class="btn primary" id="generate">Generate next state</button><button class="btn" id="reset">Reset canvas</button><button class="btn" id="saveImage">Save as Image</button></div></section>
+<div class="actions"><button class="btn primary" id="generate">Generate next state</button><button class="btn" id="reset">Reset canvas</button><button class="btn" id="saveImage">Save as Image</button><button class="btn" id="saveJson">Save as JSON</button></div></section>
 <aside class="side">
 <section class="panel"><div class="panel-head"><div><h2>Canvas setup</h2><p class="muted">Choose grid dimensions (1–100).</p></div></div><div class="fields">
 <label>Rows<input id="rows" type="number" min="1" max="100" value="3" step="1"></label><label>Columns<input id="columns" type="number" min="1" max="100" value="3" step="1"></label></div>
@@ -49,5 +49,6 @@ $("generate").addEventListener("click",()=>{const n=s.rows*s.cols;if(s.items.len
 $("reset").addEventListener("click",()=>{s.items=[];render()});
 $("apply").addEventListener("click",()=>{const r=Number($("rows").value),c=Number($("columns").value);if(!Number.isInteger(r)||!Number.isInteger(c)||r<1||r>100||c<1||c>100){return}s.rows=r;s.cols=c;s.items=[];render()});
 $("saveImage").addEventListener("click",()=>{const canvas=document.createElement("canvas");canvas.width=s.cols;canvas.height=s.rows;const ctx=canvas.getContext("2d");ctx.fillStyle="#fff";ctx.fillRect(0,0,s.cols,s.rows);ctx.fillStyle="#000";for(const index of s.items){const row=Math.floor(index/s.cols),col=index%s.cols;ctx.fillRect(col,row,1,1)}canvas.toBlob(blob=>{if(!blob)return;const url=URL.createObjectURL(blob),link=document.createElement("a");link.href=url;link.download=`pixelartjs-${s.rows}x${s.cols}.png`;link.click();URL.revokeObjectURL(url)},"image/png")});
+$("saveJson").addEventListener("click",()=>{const data={rows:s.rows,columns:s.cols,array_elements:[...s.items]};const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});const url=URL.createObjectURL(blob),link=document.createElement("a");link.href=url;link.download=`pixelartjs-${s.rows}x${s.cols}.json`;link.click();URL.revokeObjectURL(url)});
 render()})();
 </script></body></html>
