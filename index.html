@@ -13,15 +13,15 @@ h1{font-size:clamp(36px,6vw,58px);line-height:1.05;letter-spacing:-.04em;margin:
 .layout{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(270px,.8fr);gap:18px;align-items:start}
 .panel{background:linear-gradient(150deg,#192940,#111d30);border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:0 18px 50px #0002;min-width:0}
 .panel h2{font-size:17px;margin:0}.panel-head{display:flex;justify-content:space-between;align-items:start;gap:12px;margin-bottom:18px}
-.muted{font-size:13px;margin:5px 0 0}.canvas-wrap{display:grid;place-items:center;min-height:380px;padding:20px;border:1px dashed #3a506b;border-radius:14px;background:#0d1726}
-#grid{display:grid;width:min(100%,340px);aspect-ratio:1;gap:0}.pixel{border:0;border-radius:0;background:#fff}.pixel.on{background:#000}
+.muted{font-size:13px;margin:5px 0 0}.canvas-wrap{display:grid;place-items:center;min-height:380px;padding:20px;border:1px dashed #3a506b;border-radius:14px;background:#0d1726;overflow:auto}
+#grid{display:grid;width:min(100%,500px);aspect-ratio:1;gap:0;flex:none}.pixel{min-width:0;min-height:0;border:0;border-radius:0;background:#fff}.pixel.on{background:#000}
 .actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:17px}.btn{border:1px solid var(--line);border-radius:10px;padding:10px 14px;color:var(--text);background:#1d3049;font-weight:650;cursor:pointer}.btn.primary{background:var(--accent);border-color:var(--accent);color:#08251e}.btn:disabled{opacity:.45;cursor:not-allowed}
 .side{display:grid;gap:18px}.fields,.metrics{display:grid;grid-template-columns:1fr 1fr;gap:10px}label{display:grid;gap:6px;color:var(--muted);font-size:12px}input{width:100%;padding:10px;border:1px solid var(--line);border-radius:9px;background:#0d1726;color:var(--text)}
 .metric{padding:12px;border:1px solid var(--line);border-radius:11px;background:#0d1726}.metric span{display:block;color:var(--muted);font-size:11px}.metric strong{font-size:23px}
 pre{white-space:pre-wrap;overflow-wrap:anywhere;padding:12px;border-radius:10px;background:#0b1523;color:#c9d8e9;font-size:12px}
 footer{text-align:center;color:#71839a;font-size:11px;margin-top:25px}
 @media(max-width:800px){.layout{grid-template-columns:1fr}.side{grid-template-columns:1fr 1fr}}
-@media(max-width:560px){.shell{width:calc(100% - 22px);padding-top:18px}.panel{padding:16px}.side{grid-template-columns:1fr}.canvas-wrap{min-height:280px;padding:12px}#grid{gap:0}}
+@media(max-width:560px){.shell{width:calc(100% - 22px);padding-top:18px}.panel{padding:16px}.side{grid-template-columns:1fr}.canvas-wrap{min-height:280px;padding:12px}#grid{width:min(100%,500px);gap:0}}
 </style>
 </head>
 <body><main class="shell">
@@ -33,13 +33,12 @@ footer{text-align:center;color:#71839a;font-size:11px;margin-top:25px}
 <p class="muted" id="dimensions">3 rows × 3 columns · 9 positions</p>
 <div class="actions"><button class="btn primary" id="generate">Generate next state</button><button class="btn" id="reset">Reset canvas</button></div></section>
 <aside class="side">
-<section class="panel"><div class="panel-head"><div><h2>Canvas setup</h2><p class="muted">Choose grid dimensions.</p></div></div><div class="fields">
-<label>Rows<input id="rows" type="number" min="1" max="10" value="3"></label><label>Columns<input id="columns" type="number" min="1" max="10" value="3"></label></div>
+<section class="panel"><div class="panel-head"><div><h2>Canvas setup</h2><p class="muted">Choose grid dimensions (1–100).</p></div></div><div class="fields">
+<label>Rows<input id="rows" type="number" min="1" max="100" value="3" step="1"></label><label>Columns<input id="columns" type="number" min="1" max="100" value="3" step="1"></label></div>
 <div class="actions"><button class="btn" id="apply">Apply dimensions</button></div></section>
 <section class="panel"><div class="panel-head"><div><h2>State inspector</h2><p class="muted">Array and canvas occupancy.</p></div><span class="tag">LIVE</span></div>
 <div class="metrics"><div class="metric"><span>Occupied</span><strong id="occupied">0</strong></div><div class="metric"><span>Empty</span><strong id="empty">9</strong></div></div><pre id="array">array_elements = []</pre></section>
 </aside></div>
-
 <footer>PixelArtJS · Experimental interface · No external dependencies</footer>
 </main>
 <script>
@@ -48,6 +47,6 @@ function render(){const n=s.rows*s.cols,used=new Set(s.items),g=$("grid");g.repl
 function nextCombo(a,n){const b=[...a];for(let i=b.length-1;i>=0;i--){if(b[i]<n-b.length+i){b[i]++;for(let j=i+1;j<b.length;j++)b[j]=b[j-1]+1;return b}}return null}
 $("generate").addEventListener("click",()=>{const n=s.rows*s.cols;if(s.items.length>=n)return;let next=s.items.length?nextCombo(s.items,n):[0];if(!next)next=Array.from({length:s.items.length+1},(_,i)=>i);s.items=next;render()});
 $("reset").addEventListener("click",()=>{s.items=[];render()});
-$("apply").addEventListener("click",()=>{const r=Number($("rows").value),c=Number($("columns").value);if(!Number.isInteger(r)||!Number.isInteger(c)||r<1||r>10||c<1||c>10){return}s.rows=r;s.cols=c;s.items=[];render()});
+$("apply").addEventListener("click",()=>{const r=Number($("rows").value),c=Number($("columns").value);if(!Number.isInteger(r)||!Number.isInteger(c)||r<1||r>100||c<1||c>100){return}s.rows=r;s.cols=c;s.items=[];render()});
 render()})();
 </script></body></html>
