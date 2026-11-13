@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111827">
+  <title>PixelArtJS · Variation 3</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="color-engine.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <main class="app">
+    <header class="hero">
+      <p class="eyebrow">PIXELARTJS · EXPERIMENTAL BRANCH</p>
+      <h1>Variation 3 <span>Color Pipeline</span></h1>
+      <p>Different color-generation algorithms. One shared computational principle.</p>
+    </header>
+
+    <section class="panel">
+      <div class="section-heading">
+        <div><h2>Color generator</h2><p>Choose a category. Its own algorithm supplies RGB values to the shared pixel pipeline.</p></div>
+        <span class="tag">V3 · Prototype</span>
+      </div>
+      <div class="controls-grid">
+        <label>Color category
+          <select id="mode">
+            <option value="blackWhite">Black and White</option>
+            <option value="grayscale">Grayscale</option>
+            <option value="rgb">RGB</option>
+            <option value="coffeeblake">Coffeeblake · experimental</option>
+            <option value="hsl">HSL</option>
+            <option value="rubik">Rubik's Cube</option>
+            <option value="allColors">All RGB Colors</option>
+          </select>
+        </label>
+        <label>Width <input id="width" type="number" min="1" max="128" value="32"></label>
+        <label>Height <input id="height" type="number" min="1" max="128" value="32"></label>
+      </div>
+      <div class="actions">
+        <button id="generate" class="primary">Generate pixels</button>
+        <button id="download" class="secondary" disabled>Save PNG</button>
+      </div>
+      <p id="status" class="status" role="status" aria-live="polite">Ready. Select a color category and generate.</p>
+    </section>
+
+    <section class="panel">
+      <div class="section-heading">
+        <div><h2>Generated image</h2><p id="dimensions">32 × 32 pixels</p></div>
+        <strong id="pixel-count">1,024 pixels</strong>
+      </div>
+      <div class="canvas-wrap"><canvas id="art" width="32" height="32" aria-label="Generated pixel image"></canvas></div>
+      <div class="legend">
+        <span><i class="swatch black"></i> Pixel index begins at 0</span>
+        <span><i class="swatch white"></i> Row-major placement</span>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Shared computational principle</h2>
+      <div class="pipeline">
+        <div><b>1</b><strong>Sequence index</strong><small>0, 1, 2, 3 …</small></div>
+        <span>→</span>
+        <div><b>2</b><strong>Color generator</strong><small>Selected category's algorithm</small></div>
+        <span>→</span>
+        <div><b>3</b><strong>RGB value</strong><small>[R, G, B]</small></div>
+        <span>→</span>
+        <div><b>4</b><strong>Pixel placement</strong><small>Index → x/y coordinate</small></div>
+        <span>→</span>
+        <div><b>5</b><strong>ImageData</strong><small>Shared output</small></div>
+      </div>
+      <p class="note">The generator changes with the color category. The engine always requests a color for each sequence index, places that color at the corresponding pixel, and writes the completed buffer to the canvas.</p>
+    </section>
+
+    <section class="panel">
+      <div class="section-heading"><div><h2>Engine self-test</h2><p>Checks generator output and shared pixel placement.</p></div><button id="test" class="secondary">Run tests</button></div>
+      <ul id="test-results" class="test-results"><li>Not run yet.</li></ul>
+    </section>
+    <footer>PixelArtJS Variation 3 · Independent prototype · No external libraries</footer>
+  </main>
+</body>
+</html>
