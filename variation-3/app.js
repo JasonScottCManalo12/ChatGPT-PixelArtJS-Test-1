@@ -48,7 +48,7 @@
     const bw = engine.generateGrid({ mode: "blackWhite", width: 4, height: 1 });
     assert("Black-and-white generator alternates black and white", bw.pixels[0] === 0 && bw.pixels[4] === 255 && bw.pixels[8] === 0 && bw.pixels[12] === 255);
     const rgb = engine.generateGrid({ mode: "rgb", width: 257, height: 1 });
-    assert("RGB counter carries blue into green", rgb.pixels[4 * 255 + 1] === 1 && rgb.pixels[4 * 256] === 0 && rgb.pixels[4 * 256 + 1] === 1);
+    assert("RGB counter carries blue into green", rgb.pixels[4 * 255 + 2] === 255 && rgb.pixels[4 * 256] === 0 && rgb.pixels[4 * 256 + 1] === 1 && rgb.pixels[4 * 256 + 2] === 0);
     const all = engine.generateGrid({ mode: "allColors", width: 257, height: 1 });
     assert("All-colors division formula carries blue into green", all.pixels[4 * 256] === 0 && all.pixels[4 * 256 + 1] === 1);
     const rubik = engine.generateGrid({ mode: "rubik", width: 7, height: 1 });
