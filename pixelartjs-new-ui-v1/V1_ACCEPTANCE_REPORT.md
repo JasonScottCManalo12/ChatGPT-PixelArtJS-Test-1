@@ -43,6 +43,8 @@ The 150/150 tally is not the same as 150 automated tests, and it does not indepe
 1. Expanded `TEST_PLAN.md` to record the full 150-check evidence set and identify remaining release gates.
 2. Expanded the Node.js sequence tests with exhaustive invariants for 5- and 10-position sequences and boundary checks for a 10,000-position grid.
 3. Added a GitHub Actions workflow to run the sequence tests on pushes to and pull requests targeting `pixelartjs-new-ui-v1`.
+4. Verified the expanded Node test suite locally: **6 passed, 0 failed**.
+5. Verified GitHub Actions PR run **43687470689** completed successfully.
 4. Preserved the main workspace and both research components; no application behavior was changed in this update.
 
 ## Remaining release gates
@@ -57,6 +59,6 @@ The 150/150 tally is not the same as 150 automated tests, and it does not indepe
 
 ## Release decision
 
-**Status: Acceptance evidence substantially complete; release approval pending.**
+**Status: Acceptance evidence substantially complete; release approval pending.** The acceptance-hardening PR #5 was merged into `pixelartjs-new-ui-v1` after its CI run succeeded. This does not merge or modify `main`.
 
 The user-reported 150/150 result is strong manual evidence, but the outstanding gates above must be completed or explicitly waived before calling V1 fully accepted. This update does not merge into `pixelartjs-new-ui-v1` or `main`.
