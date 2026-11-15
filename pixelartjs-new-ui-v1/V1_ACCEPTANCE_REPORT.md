@@ -62,3 +62,35 @@ The 150/150 tally is not the same as 150 automated tests, and it does not indepe
 **Status: Acceptance evidence substantially complete; release approval pending.** The acceptance-hardening PR #5 was merged into `pixelartjs-new-ui-v1` after its CI run succeeded. This does not merge or modify `main`.
 
 The user-reported 150/150 result is strong manual evidence, but the outstanding gates above must be completed or explicitly waived before calling V1 fully accepted. This update does not merge into `pixelartjs-new-ui-v1` or `main`.
+
+
+## Documentation addendum — recovered Android environment (2026-11-15)
+
+After the original report was prepared, the user recovered the Android environment used to test a locally stored PixelArtJS V1 copy:
+
+| Field | Recovered value |
+|---|---|
+| Device | OPPO CPH2773 |
+| OS | Android 14, build 2400 (build number as reported) |
+| Browser | Google Chrome 151.0.7922.173 |
+| Physical display resolution | HD+ 1604 × 720 pixels (as reported; axis/orientation convention not independently verified) |
+| Browser viewport | 360 × 669 CSS pixels |
+| Application access | Local `index.html` opened in Chrome through Android `content://` |
+| Hosting | Local file-provider access; not GitHub Pages and no local web server reported |
+| Test date | 2026-11-15 |
+
+The local README, HTML excerpts, and Node test source were inspected by the user and supplied in the conversation. The README identifies the copy as PixelArtJS V1. The inspected HTML contains the described main workspace, PNG/JSON export logic, Hanoi of Colors simulator, and Coordinate Placement vs Array Relocation experiment. The supplied local `tests/sequence.test.js` contains four test cases.
+
+### Provenance and evidence qualification
+
+- The exact commit/build used for the Android test copy remains **unknown**. No commit hash or build identifier was present in the supplied README or HTML excerpts.
+- The local files have not been proven byte-for-byte identical to the repository files on this branch. Do not attribute the repository branch's commit to the locally tested copy without a file comparison or other provenance evidence.
+- The four test cases inspected in the local copy are distinct from the repository's documented expanded six-test suite and do not establish that the latter ran on Android.
+- The 150/150 manual acceptance tally remains user-reported. Recovering environment details improves traceability but does not independently reproduce or upgrade those results.
+
+### Updated outstanding platform/provenance gates
+
+- [x] Recover Android device, OS/build, browser/version, physical display resolution, viewport, and local launch method.
+- [ ] Record exact Windows version/build, browser/version, viewport, and test date.
+- [ ] Identify or reproduce the exact Android-tested application revision; commit/build remains unknown.
+- [ ] Pin the application revision for any new acceptance rerun and record its commit hash.
