@@ -9,6 +9,7 @@ on:
       - 'android.zip'
       - 'windows.zip'
       - 'windows/pixelartjs-new-ui-v1.rar'
+      - 'RECONCILIATION_INVENTORY.md'
       - '.github/workflows/legacy-reconciliation-audit.yml'
 
 permissions:
@@ -62,18 +63,20 @@ jobs:
               report.extend([f"## {label}", ""])
               archive_info = {"files": []}
               for name, data in sorted(entries.items()):
-                  # Archive layout is rooted at pixelartjs-new-ui-v1/.
                   normalized = name.replace("\\", "/")
                   prefix = "pixelartjs-new-ui-v1/"
                   if normalized.startswith(prefix):
                       relative = normalized[len(prefix):]
                   else:
                       relative = normalized.lstrip("/")
-                  if not relative or relative.endswith("/"):
+                  candidate = pathlib.PurePosixPath(relative)
+                  if (not relative or relative.endswith("/") or candidate.is_absolute()
+                          or ".." in candidate.parts):
+                      report.append(f"- Skipped unsafe or empty archive path: `{name}`")
                       continue
-                  current_path = root / "pixelartjs-new-ui-v1" / relative
+                  current_path = root / "pixelartjs-new-ui-v1" / pathlib.Path(*candidate.parts)
                   current = current_path.read_bytes() if current_path.is_file() else None
-                  status = "IDENTICAL" if current == data else ("DIFFERENT" if current is not None else "NOT PRESENT IN CURRENT BRANCH")
+                  status = "IDENTICAL" if current == data else ( "DIFFERENT" if current is not None else "NOT PRESENT IN CURRENT BRANCH")
                   item = {
                       "archive": label,
                       "path": relative,
