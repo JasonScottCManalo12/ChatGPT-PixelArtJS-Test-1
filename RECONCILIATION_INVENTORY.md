@@ -74,3 +74,16 @@ This establishes that the archived file entries are not byte-identical to the cu
 5. Review the pull request before any merge.
 
 No application source files have been changed by this reconciliation inventory. No merge is authorized by this document.
+
+
+## Automated audit workflow
+
+A dedicated GitHub Actions workflow has been added at `.github/workflows/legacy-reconciliation-audit.yml`.
+
+- It can be started manually with `workflow_dispatch`.
+- It also triggers when the ZIP/RAR artifacts or workflow definition change on this reconciliation branch.
+- It inspects ZIP and RAR contents as data; it does not execute archived application code or tests.
+- It compares extracted file bytes with the current `pixelartjs-new-ui-v1` checkout and produces a Markdown report, JSON results, and an uploaded workflow artifact.
+- It does not modify application source files or merge branches.
+
+The workflow definition is committed, but a successful Actions run and generated report have not yet been verified in this inventory.
