@@ -168,3 +168,107 @@ The manual results are strong evidence, but the following items remain open unti
 ## Acceptance boundary
 
 The 150/150 tally is user-reported manual acceptance evidence. Automated tests, source inspection, and CI checks are separate evidence classes. Do not label V1 fully released or merge into `main` solely from this tally. Version branches remain independent and pull requests are the required review boundary before changes enter a destination branch.
+
+
+## Supplemental V1 regression session — 41/41 user-reported PASS (2026-11-15)
+
+This is a follow-up session recorded after the original 150-check baseline. These 41 checks overlap existing test categories and must **not** be added to the 150 as though they were 41 new unique acceptance requirements.
+
+| Follow-up area | Checks | Result |
+|---|---:|---:|
+| Main workspace dimension input validation | 8 | 8/8 PASS |
+| Main workspace preservation after invalid input | 3 | 3/3 PASS |
+| Hanoi of Colors boundary, invalid-input, reset, and next-state checks | 6 | 6/6 PASS |
+| Coordinate Placement vs Array Relocation follow-up | 5 | 5/5 PASS |
+| PNG export regression | 5 | 5/5 PASS |
+| JSON export regression | 5 | 5/5 PASS |
+| Cross-platform regression and output consistency | 4 | 4/4 PASS |
+| Final functional regression and stability | 5 | 5/5 PASS |
+| **Supplemental total** | **41** | **41/41 PASS** |
+
+### Main workspace — 11/11 follow-up PASS
+
+**Dimension validation — 8/8**
+- [x] Blank rows rejected.
+- [x] Blank columns rejected.
+- [x] Decimal dimensions rejected.
+- [x] Zero rejected.
+- [x] Negative values not accepted.
+- [x] Maximum dimension of 100 enforced.
+- [x] Minimum dimension of 1 accepted.
+- [x] Maximum dimension of 100 accepted.
+
+**Canvas preservation — 3/3**
+- [x] Invalid dimensions preserve the existing 3×3 canvas.
+- [x] Blank dimensions preserve the existing canvas.
+- [x] Values above 100 preserve the existing canvas.
+
+### Hanoi of Colors — 6/6 follow-up PASS
+
+- [x] Minimum boundary 1×1.
+- [x] Maximum boundary 5×5.
+- [x] Non-square dimensions 2×5.
+- [x] Invalid dimensions (blank, zero, negative, decimal, and above-maximum inputs) rejected.
+- [x] Reset returns the grid to the empty initial state.
+- [x] Next-State generation advances correctly through the tested sequence and handles the fully occupied final state.
+
+### Coordinate Placement vs Array Relocation — 5/5 follow-up PASS
+
+- [x] Minimum boundary 1×1.
+- [x] Maximum supported boundary 10×10 (100 entries per method). This experiment's maximum is 10×10; it does not support 100×100.
+- [x] Non-square dimensions 2×5.
+- [x] 5×5 methods produce the same entries.
+- [x] 10×10 methods produce equivalent outputs.
+
+### PNG export regression — 5/5 follow-up PASS
+
+- [x] 1×1.
+- [x] 3×3.
+- [x] 2×5.
+- [x] 5×2.
+- [x] 100×100.
+
+The user reported correct occupied/empty representation, cell coverage, layout, and no unintended gaps or borders for these cases.
+
+### JSON export regression — 5/5 follow-up PASS
+
+- [x] 1×1.
+- [x] 3×3.
+- [x] 2×5.
+- [x] 5×2.
+- [x] 100×100.
+
+The user reported valid JSON, correct dimensions and cell values, row-major ordering, no missing/duplicated entries, and matching workspace data.
+
+### Cross-platform regression — 4/4 follow-up PASS
+
+- [x] Android Main Workspace workflow passed.
+- [x] Windows PC Main Workspace workflow passed.
+- [x] 3×3 PNG/JSON outputs were equivalent across platforms.
+- [x] 100×100 PNG/JSON outputs were equivalent across platforms.
+
+### Final functional regression — 5/5 follow-up PASS
+
+- [x] Main Workspace reset and regeneration (5×5 then 2×5).
+- [x] Hanoi of Colors reset and regeneration (5×5).
+- [x] Visual Experiment reset/regeneration (5×5 then 2×5); methods remained equivalent.
+- [x] Navigation and isolation across all three sections.
+- [x] Repeated operations/stability: five generate/reset cycles, repeated PNG/JSON exports, section navigation, and no reported crash, freeze, stale data, corrupted export, or progressive responsiveness issue.
+
+## Updated release-gate status after follow-up
+
+- [x] Main workspace blank, decimal, zero, negative, and above-maximum dimension checks individually reported PASS.
+- [x] Existing canvas preservation after invalid input reported PASS.
+- [x] Hanoi additional boundaries including 5×5, plus invalid inputs, reset, and next-state behavior reported PASS.
+- [x] Follow-up PNG and JSON export regression reported PASS for 1×1, 3×3, 2×5, 5×2, and 100×100.
+- [x] Cross-platform workflow and output equivalence reported PASS on Android and Windows PC.
+- [x] Three-section functional regression, navigation/isolation, and repeated-operation stability reported PASS.
+- [ ] Record exact Android device model, Android version, browser/version, viewport, and test date/build.
+- [ ] Record exact Windows version, browser/version, viewport, and test date/build.
+- [ ] Pin the exact application commit/build used for the follow-up manual session.
+- [ ] Independently inspect actual exported PNG files and record exact pixel dimensions.
+- [ ] Independently parse actual exported JSON files and compare their complete contents to workspace state.
+- [ ] Capture separate numerical performance measurements if quantitative performance certification is required.
+- [ ] Complete the release decision; do not merge to main without explicit user approval.
+
+**Evidence note:** The 41 supplemental checks are user-reported manual results. They are additional coverage evidence, not independent reproductions or automated tests. The original 150-check tally remains its own historical baseline; because the follow-up session overlaps that baseline, do not claim 191 unique tests.
