@@ -1,0 +1,182 @@
+name: Legacy Download Reconciliation Audit
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - reconcile/legacy-windows-android
+    paths:
+      - 'android.zip'
+      - 'windows.zip'
+      - 'windows/pixelartjs-new-ui-v1.rar'
+      - 'RECONCILIATION_INVENTORY.md'
+      - '.github/workflows/legacy-reconciliation-audit.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    name: Compare legacy downloads with branch snapshot
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out reconciliation branch
+        uses: actions/checkout@v4
+        with:
+          ref: reconcile/legacy-windows-android
+          persist-credentials: false
+
+      - name: Install RAR inspection utility
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y 7zip
+
+      - name: Compare ZIP and RAR contents
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p audit-output
+          python3 - <<'PY'
+          import difflib
+          import hashlib
+          import json
+          import pathlib
+          import subprocess
+          import zipfile
+
+          root = pathlib.Path(".").resolve()
+          output = root / "audit-output"
+          report = [
+              "# Legacy Download Content Reconciliation",
+              "",
+              "This report compares archived files with the checked-out reconciliation branch snapshot.",
+              "Archives are inspected as data only; no archived program or test is executed.",
+              "",
+          ]
+          summary = {"archives": {}, "files": []}
+
+          def sha256(data):
+              return hashlib.sha256(data).hexdigest()
+
+          def compare(label, entries):
+              report.extend([f"## {label}", ""])
+              archive_info = {"files": []}
+              for name, data in sorted(entries.items()):
+                  normalized = name.replace("\\", "/")
+                  prefix = "pixelartjs-new-ui-v1/"
+                  if normalized.startswith(prefix):
+                      relative = normalized[len(prefix):]
+                  else:
+                      relative = normalized.lstrip("/")
+                  candidate = pathlib.PurePosixPath(relative)
+                  if (not relative or relative.endswith("/") or candidate.is_absolute()
+                          or ".." in candidate.parts):
+                      report.append(f"- Skipped unsafe or empty archive path: `{name}`")
+                      continue
+                  current_path = root / "pixelartjs-new-ui-v1" / pathlib.Path(*candidate.parts)
+                  current = current_path.read_bytes() if current_path.is_file() else None
+                  status = "IDENTICAL" if current == data else ( "DIFFERENT" if current is not None else "NOT PRESENT IN CURRENT BRANCH")
+                  item = {
+                      "archive": label,
+                      "path": relative,
+                      "status": status,
+                      "archive_bytes": len(data),
+                      "archive_sha256": sha256(data),
+                      "current_sha256": sha256(current) if current is not None else None,
+                  }
+                  archive_info["files"].append(item)
+                  summary["files"].append(item)
+                  report.append(f"### {relative}")
+                  report.append(f"- Status: **{status}**")
+                  report.append(f"- Archived SHA-256: `{item['archive_sha256']}`")
+                  report.append(f"- Current SHA-256: `{item['current_sha256'] or 'not found'}`")
+                  if current is not None:
+                      try:
+                          old_text = data.decode("utf-8").splitlines(keepends=True)
+                          new_text = current.decode("utf-8").splitlines(keepends=True)
+                          diff = list(difflib.unified_diff(
+                              old_text, new_text,
+                              fromfile=f"{label}/{relative}",
+                              tofile=f"current/{relative}",
+                              n=3,
+                          ))
+                          if diff:
+                              report.extend(["", "```diff", "".join(diff).rstrip(), "```"])
+                      except UnicodeDecodeError:
+                          report.append("- Binary content: byte-level hash comparison only.")
+                  report.append("")
+              summary["archives"][label] = archive_info
+
+          for archive_name, label in [("android.zip", "Android ZIP"), ("windows.zip", "Windows ZIP")]:
+              path = root / archive_name
+              if not path.is_file():
+                  raise SystemExit(f"Required archive missing: {archive_name}")
+              with zipfile.ZipFile(path) as zf:
+                  entries = {i.filename: zf.read(i) for i in zf.infolist() if not i.is_dir()}
+              compare(label, entries)
+
+          rar_path = root / "windows" / "pixelartjs-new-ui-v1.rar"
+          if rar_path.is_file():
+              extract_dir = output / "rar-extracted"
+              extract_dir.mkdir(parents=True, exist_ok=True)
+              import shutil
+              extractor = next(
+                  (shutil.which(candidate) for candidate in ("7zz", "7z", "7zzs")
+                   if shutil.which(candidate)),
+                  None,
+              )
+              if extractor is None:
+                  summary["archives"]["Windows RAR"] = {
+                      "status": "EXTRACTION TOOL UNAVAILABLE",
+                  }
+                  (output / "rar-extraction.log").write_text(
+                      "No supported 7-Zip executable found (tried 7zz, 7z, 7zzs).",
+                      encoding="utf-8",
+                  )
+              else:
+                  result = subprocess.run(
+                      [extractor, "x", "-y", f"-o{extract_dir}", str(rar_path)],
+                      text=True, capture_output=True,
+                  )
+                  (output / "rar-extraction.log").write_text(
+                      result.stdout + "\\n" + result.stderr, encoding="utf-8"
+                  )
+                  if result.returncode == 0:
+                      entries = {}
+                      for file in extract_dir.rglob("*"):
+                          if file.is_file():
+                              entries[file.relative_to(extract_dir).as_posix()] = file.read_bytes()
+                      compare("Windows RAR", entries)
+                  else:
+                      summary["archives"]["Windows RAR"] = {
+                          "status": "EXTRACTION FAILED",
+                          "returncode": result.returncode,
+                      }
+              if extractor is None or summary["archives"].get("Windows RAR", {}).get("status") == "EXTRACTION FAILED":
+                  report.extend([
+                      "## Windows RAR",
+                      "",
+                      f"RAR extraction status: {summary['archives']['Windows RAR']['status']}. See `rar-extraction.log`.",
+                      "",
+                  ])
+          else:
+              summary["archives"]["Windows RAR"] = {"status": "NOT FOUND"}
+
+          counts = {}
+          for item in summary["files"]:
+              counts[item["status"]] = counts.get(item["status"], 0) + 1
+          summary["status_counts"] = counts
+          report.extend(["## Summary", "", "```json", json.dumps(summary, indent=2), "```", ""])
+          (output / "RECONCILIATION_REPORT.md").write_text("\n".join(report), encoding="utf-8")
+          (output / "reconciliation-results.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
+          print(json.dumps(counts, indent=2))
+          PY
+
+      - name: Upload reconciliation report
+        uses: actions/upload-artifact@v4
+        with:
+          name: pixelartjs-legacy-reconciliation-report
+          path: audit-output/
+          if-no-files-found: error
+          retention-days: 30
