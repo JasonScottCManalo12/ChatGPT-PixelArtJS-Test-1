@@ -27,4 +27,9 @@ Open `index.html` in a modern browser. No package installation, build step, serv
 
 ## Verification
 
-See [TEST_PLAN.md](TEST_PLAN.md). Run the automated sequence tests with `node --test tests/sequence.test.js`.
+- Test plan and manual evidence: [TEST_PLAN.md](TEST_PLAN.md)
+- Consolidated release-gate status: [V1_ACCEPTANCE_REPORT.md](V1_ACCEPTANCE_REPORT.md)
+- Run automated sequence tests: `node --test pixelartjs-new-ui-v1/tests/sequence.test.js`
+- GitHub Actions runs the sequence tests for pushes to and pull requests targeting `pixelartjs-new-ui-v1`.
+
+Manual browser checks are recorded as user-reported evidence; automated tests and CI are separate verification layers.
