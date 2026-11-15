@@ -102,3 +102,31 @@ Still open:
 - Complete final release review and obtain explicit approval before any merge into `main`.
 
 All follow-up manual results remain user-reported evidence. No application source/runtime behavior was changed by this documentation update.
+
+
+## Independent export-artifact verification — 2026-11-15
+
+**Result: 10/10 uploaded reference files PASS** (five PNG and five JSON files in `test-artifacts/export-verification/`).
+
+### PNG verification
+
+- All five PNG files decoded successfully and had the expected dimensions.
+- The non-square cases correctly report image width = columns and image height = rows.
+- All 10,030 pixels across the five files were independently checked and were opaque white RGBA `(255, 255, 255, 255)`.
+- No unexpected colors or dimension mismatches were found.
+
+### JSON verification
+
+- All five JSON files parsed successfully.
+- Each contained the expected `rows`, `columns`, and `array_elements` fields.
+- Each dimension pair matched its test configuration, and every `array_elements` array was empty.
+
+### Evidence boundary
+
+This independent verification covers the uploaded **empty-state reference exports only**. It does not independently verify occupied-cell PNG rendering, non-empty JSON serialization, all sequence states, or all platform-specific export paths. The source export implementation was inspected as supporting evidence.
+
+The artifact-upload commit must not be mistaken for the application commit/build that generated the files. The exact tested application commit/build and platform environment details remain outstanding.
+
+## Updated acceptance position
+
+The 10/10 independent artifact checks strengthen the existing user-reported manual evidence. They do not close the remaining platform-identification and build-pinning gates, and they do not constitute V1 release approval. The V1 release decision remains pending.
