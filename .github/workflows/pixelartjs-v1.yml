@@ -1,0 +1,26 @@
+name: PixelArtJS V1 checks
+
+on:
+  push:
+    branches:
+      - pixelartjs-new-ui-v1
+  pull_request:
+    branches:
+      - pixelartjs-new-ui-v1
+
+permissions:
+  contents: read
+
+jobs:
+  sequence-tests:
+    name: Sequence invariants (Node.js)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Run V1 sequence tests
+        run: node --test pixelartjs-new-ui-v1/tests/sequence.test.js
