@@ -94,3 +94,22 @@ h2 { margin: 0; font-size: 1.15rem; letter-spacing: -.02em; }
 .new-canvas-panel .config-form { grid-template-columns: 1fr 1fr; }
 .new-canvas-panel .config-form button { grid-column: auto; }
 [hidden] { display: none !important; }
+
+/* Arithmetic and coordinate-mapping visual experiment */
+.visual-test-controls { display: grid; grid-template-columns: 110px 110px minmax(160px, 1fr); align-items: end; gap: 12px; }
+.visual-comparison { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 20px; }
+.visual-method { min-width: 0; padding: 14px; border: 1px solid #e4e8f0; border-radius: 14px; background: #fafbfe; }
+.visual-method h3 { margin: 0; font-size: .94rem; }
+.visual-time { margin: 6px 0 12px; color: var(--muted); font-size: .8rem; font-variant-numeric: tabular-nums; }
+.result-grid { display: grid; gap: 4px; }
+.result-cell { display: grid; place-items: center; min-width: 0; aspect-ratio: 1; border: 1px solid #b8c1d2; border-radius: 6px; background: #fff; color: #172033; font-size: clamp(.65rem, 2vw, .9rem); font-weight: 750; font-variant-numeric: tabular-nums; overflow: hidden; }
+.visual-verdict { margin: 14px 0 0; padding: 11px 12px; border-radius: 10px; background: #f3f5f9; font-size: .88rem; font-weight: 800; }
+.visual-details { margin-top: 12px; color: #475467; font-size: .82rem; line-height: 1.55; }
+.visual-details summary { cursor: pointer; font-weight: 750; }
+.visual-details p { margin-bottom: 0; }
+
+@media (max-width: 620px) {
+  .visual-comparison { grid-template-columns: 1fr; }
+  .visual-test-controls { grid-template-columns: 1fr 1fr; }
+  .visual-test-controls button { grid-column: 1 / -1; }
+}

@@ -375,6 +375,85 @@
     renderLog();
   }
 
+  // Browser visual experiment: same coordinate/value entries, two placement strategies.
+  const visualRows = document.querySelector("#visual-rows");
+  const visualColumns = document.querySelector("#visual-columns");
+  const visualRun = document.querySelector("#visual-run");
+  const arithmeticGrid = document.querySelector("#visual-arithmetic-grid");
+  const relocationGrid = document.querySelector("#visual-relocation-grid");
+  const arithmeticTime = document.querySelector("#visual-arithmetic-time");
+  const relocationTime = document.querySelector("#visual-relocation-time");
+  const visualVerdict = document.querySelector("#visual-verdict");
+
+  function makeVisualEntries(rows, columns) {
+    const entries = [];
+    for (let row = 0; row < rows; row += 1) {
+      for (let column = 0; column < columns; column += 1) {
+        entries.push({ row, column, value: (row * 17 + column * 31) % 256 });
+      }
+    }
+    return entries;
+  }
+
+  function arithmeticPlacement(entries, rows, columns) {
+    const output = new Array(rows * columns);
+    for (const entry of entries) output[entry.row * columns + entry.column] = entry.value;
+    return output;
+  }
+
+  function relocationPlacement(entries, rows, columns) {
+    const output = [];
+    for (const entry of entries) output.splice(entry.row * columns + entry.column, 0, entry.value);
+    return output;
+  }
+
+  function measureMedian(fn, entries, rows, columns) {
+    fn(entries, rows, columns);
+    const samples = [];
+    for (let round = 0; round < 7; round += 1) {
+      const start = performance.now();
+      fn(entries, rows, columns);
+      samples.push(performance.now() - start);
+    }
+    samples.sort((a, b) => a - b);
+    return samples[3];
+  }
+
+  function renderResultGrid(container, values, rows, columns) {
+    container.replaceChildren();
+    container.style.gridTemplateColumns = `repeat(${columns}, minmax(0, 1fr))`;
+    values.forEach((value, index) => {
+      const cell = document.createElement("div");
+      cell.className = "result-cell";
+      cell.textContent = String(value);
+      cell.title = `Row ${Math.floor(index / columns) + 1}, column ${index % columns + 1}; flat index ${index}`;
+      container.append(cell);
+    });
+  }
+
+  function runVisualTest() {
+    const rows = Number(visualRows.value), columns = Number(visualColumns.value);
+    if (!Number.isInteger(rows) || !Number.isInteger(columns) || rows < 1 || rows > 10 || columns < 1 || columns > 10) {
+      visualVerdict.className = "visual-verdict error";
+      visualVerdict.textContent = "Use whole-number dimensions from 1 to 10.";
+      return;
+    }
+    const entries = makeVisualEntries(rows, columns);
+    const arithmeticOutput = arithmeticPlacement(entries, rows, columns);
+    const relocationOutput = relocationPlacement(entries, rows, columns);
+    const matches = arithmeticOutput.length === relocationOutput.length && arithmeticOutput.every((value, index) => value === relocationOutput[index]);
+    const arithmeticMs = measureMedian(arithmeticPlacement, entries, rows, columns);
+    const relocationMs = measureMedian(relocationPlacement, entries, rows, columns);
+    renderResultGrid(arithmeticGrid, arithmeticOutput, rows, columns);
+    renderResultGrid(relocationGrid, relocationOutput, rows, columns);
+    arithmeticTime.textContent = `Median: ${arithmeticMs.toFixed(4)} ms`;
+    relocationTime.textContent = `Median: ${relocationMs.toFixed(4)} ms`;
+    visualVerdict.className = matches ? "visual-verdict success" : "visual-verdict error";
+    visualVerdict.textContent = matches ? `PASS · Both grids contain identical row-major values (${rows} × ${columns}, ${rows * columns} cells).` : "FAIL · The methods produced different outputs.";
+  }
+
+  visualRun.addEventListener("click", runVisualTest);
+
   $("#new-canvas-button").addEventListener("click", () => {
     newRowsInput.value = String(state.rows);
     newColumnsInput.value = String(state.columns);
@@ -398,4 +477,5 @@
   updateFileName();
   record("Ready. Empty 3 × 3 canvas.", "note");
   render();
+  runVisualTest();
 })();
