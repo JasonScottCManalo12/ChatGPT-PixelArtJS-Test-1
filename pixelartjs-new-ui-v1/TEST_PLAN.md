@@ -37,7 +37,7 @@
 - [x] 10×10.
 - [x] Timing display/measurement.
 - [x] Invalid dimensions.
-- [ ] Explicit browser confirmation that Method A and Method B outputs are identical — pending separate confirmation. The implementation compares outputs and displays a PASS/FAIL verdict, but the user's test report did not explicitly state the observed equality verdict.
+- [x] Explicit browser confirmation that Method A and Method B outputs are identical for 1×1, 3×3, non-square, and 10×10 configurations — user-reported PASS on 2026-11-15.
 
 **User-reported smoke-test tally: 25/25 PASS.** One additional equality observation remains pending and is not included in that tally.
 
@@ -60,10 +60,10 @@
 
 ## Visual experiment detailed test expectations
 
-- [ ] 1×1, 3×3, non-square, and 10×10 outputs are explicitly observed to match between both methods.
+- [x] 1×1, 3×3, non-square, and 10×10 outputs explicitly observed to match between both methods — user-reported PASS.
 - [ ] Invalid dimensions show feedback.
 - [x] Timing is displayed as browser-dependent and informational, not as a deterministic performance assertion.
-- [ ] Record the displayed output-equality verdict for each tested dimension set.
+- [x] Record the displayed output-equality verdict for each tested dimension set — all four reported PASS on 2026-11-15.
 
 ## Acceptance boundary
 
