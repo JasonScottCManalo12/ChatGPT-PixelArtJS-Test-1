@@ -16,28 +16,46 @@
       <p class="intro">Create a grid configuration, then explore occupancy states in increasing order of occupied positions.</p>
     </header>
 
-    <section class="panel" aria-labelledby="file-title">
+    <section class="panel file-panel" aria-labelledby="file-title">
       <div class="section-heading">
         <div>
-          <h2 id="file-title">Create File</h2>
-          <p class="muted">Choose the canvas dimensions and export a JSON simulation configuration.</p>
+          <h2 id="file-title">File</h2>
+          <p class="muted">Create, open, and export your Hanoi of Colors canvas.</p>
         </div>
+        <span id="file-name-display" class="file-name">hanoi-3x3.json</span>
       </div>
-      <form id="config-form" class="config-form">
-        <label>Rows
-          <input id="rows-input" name="rows" type="number" min="1" max="5" value="3" required>
-        </label>
-        <label>Columns
-          <input id="columns-input" name="columns" type="number" min="1" max="5" value="3" required>
-        </label>
-        <label class="filename-field">Filename
-          <input id="filename-input" name="filename" type="text" value="hanoi-3x3.json" required>
-        </label>
-        <p id="config-summary" class="config-summary">3 × 3 grid · 9 positions · 512 possible occupancy states</p>
-        <button id="create-file-button" class="button primary" type="submit">Create File · Download JSON</button>
-      </form>
-      <p class="hint">Creates a downloadable configuration file with the selected dimensions and an empty initial canvas. The browser cannot commit files directly to GitHub.</p>
-      <p id="file-status" class="status" role="status" aria-live="polite">Ready to create hanoi-3x3.json.</p>
+      <nav class="file-menu" aria-label="File commands">
+        <button id="new-canvas-button" class="button secondary" type="button">New Canvas</button>
+        <button id="load-canvas-button" class="button secondary" type="button">Load Canvas</button>
+        <button id="save-json-button" class="button secondary" type="button">Save as JSON</button>
+        <div class="export-group">
+          <label for="image-format-select">Save as Image</label>
+          <select id="image-format-select" aria-label="Image format">
+            <option value="png">PNG</option>
+            <option value="jpeg">JPEG</option>
+            <option value="bmp">BMP</option>
+          </select>
+          <button id="save-image-button" class="button primary" type="button">Export Image</button>
+        </div>
+      </nav>
+      <div id="new-canvas-panel" class="new-canvas-panel" hidden>
+        <h3>New Canvas</h3>
+        <p class="muted">Choose dimensions for a fresh, empty canvas.</p>
+        <form id="new-canvas-form" class="config-form">
+          <label>Rows
+            <input id="new-rows-input" name="rows" type="number" min="1" max="5" value="3" required>
+          </label>
+          <label>Columns
+            <input id="new-columns-input" name="columns" type="number" min="1" max="5" value="3" required>
+          </label>
+          <p id="new-canvas-summary" class="config-summary">3 × 3 grid · 9 positions · 512 possible occupancy states</p>
+          <button class="button primary" type="submit">Create New Canvas</button>
+          <button id="cancel-new-canvas-button" class="button secondary" type="button">Cancel</button>
+        </form>
+      </div>
+      <input id="load-canvas-input" type="file" accept=".json,application/json" hidden>
+      <p class="hint">JSON preserves canvas dimensions and the current occupied positions. Image exports capture the canvas grid.</p>
+      <p id="file-status" class="status" role="status" aria-live="polite">Ready. Canvas is empty.</p>
     </section>
 
     <section class="panel" aria-labelledby="canvas-title">
