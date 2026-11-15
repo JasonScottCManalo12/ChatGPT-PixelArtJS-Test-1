@@ -168,3 +168,35 @@ The manual results are strong evidence, but the following items remain open unti
 ## Acceptance boundary
 
 The 150/150 tally is user-reported manual acceptance evidence. Automated tests, source inspection, and CI checks are separate evidence classes. Do not label V1 fully released or merge into `main` solely from this tally. Version branches remain independent and pull requests are the required review boundary before changes enter a destination branch.
+
+
+## Recovered Android test-environment details — 2026-11-15
+
+The user subsequently recovered the Android environment details for the locally stored PixelArtJS V1 copy used in testing. These details supplement, rather than replace, the original user-reported test record above.
+
+| Field | Recovered value |
+|---|---|
+| Device | OPPO CPH2773 |
+| Android version | Android 14 |
+| OS build number | 2400 (as reported by the user) |
+| Browser | Google Chrome |
+| Browser version | 151.0.7922.173 |
+| Physical display resolution | 1604 × 720 pixels, HD+ (as reported; axis/orientation convention not independently verified) |
+| Browser viewport | 360 × 669 CSS pixels |
+| Application storage | Locally stored copy on the OPPO device |
+| Launch method | Opened `index.html` in Chrome through Android's `content://` content-provider URI |
+| Hosting | Not GitHub Pages; no local web server was reported |
+| Test date | 2026-11-15 |
+
+### Local-copy inspection and provenance limits
+
+The user inspected the local copy and supplied the contents of `README.md`, the beginning and end of `index.html`, and `tests/sequence.test.js`.
+
+- The README identifies the application as PixelArtJS V1 and describes the main occupancy-grid workspace, Hanoi of Colors simulator, and Coordinate Placement vs Array Relocation experiment.
+- The inspected HTML contains the main workspace, PNG/JSON export logic, Hanoi simulator, and visual experiment.
+- The inspected local `tests/sequence.test.js` contains four Node.js test cases covering 1-position, 3-position, and 5-position sequences and final-combination termination.
+- These local-file inspections establish the described contents only. They do not establish that the local copy is byte-for-byte identical to the repository version or identify the exact Git commit used for the Android tests.
+- No commit hash, build identifier, or embedded source revision was found in the supplied README or HTML excerpts. The exact tested application revision therefore remains **unknown**.
+- The four test cases inspected in the local copy are not a claim that the repository's expanded six-test suite was executed on the OPPO device.
+
+The recovered Android details close the previously open Android environment-identification item, but the exact tested commit/build and the Windows environment details remain outstanding. The manual results remain user-reported evidence; this addendum does not upgrade them to independently reproduced results.
