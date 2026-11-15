@@ -86,4 +86,4 @@ A dedicated GitHub Actions workflow has been added at `.github/workflows/legacy-
 - It compares extracted file bytes with the current `pixelartjs-new-ui-v1` checkout and produces a Markdown report, JSON results, and an uploaded workflow artifact.
 - It does not modify application source files or merge branches.
 
-The workflow definition is committed, but a successful Actions run and generated report have not yet been verified in this inventory.
+The workflow definition is committed. An automated audit run has now been triggered by this inventory update; its completion and generated report remain to be verified.
