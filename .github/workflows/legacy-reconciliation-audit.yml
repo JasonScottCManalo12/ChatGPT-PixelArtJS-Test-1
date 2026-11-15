@@ -2,6 +2,14 @@ name: Legacy Download Reconciliation Audit
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - reconcile/legacy-windows-android
+    paths:
+      - 'android.zip'
+      - 'windows.zip'
+      - 'windows/pixelartjs-new-ui-v1.rar'
+      - '.github/workflows/legacy-reconciliation-audit.yml'
 
 permissions:
   contents: read
