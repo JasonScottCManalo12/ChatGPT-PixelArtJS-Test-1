@@ -15,6 +15,17 @@ const fixtures = [
   { rows: 100, columns: 100 },
 ];
 
+function crc32(buffer) {
+  let crc = 0xffffffff;
+  for (const byte of buffer) {
+    crc ^= byte;
+    for (let bit = 0; bit < 8; bit++) {
+      crc = (crc >>> 1) ^ ((crc & 1) ? 0xedb88320 : 0);
+    }
+  }
+  return (crc ^ 0xffffffff) >>> 0;
+}
+
 function decodeRgbaPng(filePath) {
   const png = fs.readFileSync(filePath);
   const signature = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]);
@@ -33,6 +44,9 @@ function decodeRgbaPng(filePath) {
     const dataEnd = dataStart + length;
     assert.ok(dataEnd + 4 <= png.length, `complete ${type} chunk`);
     const data = png.subarray(dataStart, dataEnd);
+    const storedCrc = png.readUInt32BE(dataEnd);
+    const calculatedCrc = crc32(png.subarray(offset + 4, dataEnd));
+    assert.equal(calculatedCrc, storedCrc, `${type} chunk CRC`);
 
     if (type === "IHDR") {
       assert.equal(header, undefined, "only one IHDR chunk");
@@ -58,6 +72,7 @@ function decodeRgbaPng(filePath) {
   }
 
   assert.ok(header, "IHDR exists");
+  assert.ok(idat.length > 0, "at least one IDAT chunk exists");
   assert.ok(ended, "IEND exists");
   assert.equal(offset, png.length, "no trailing bytes after IEND");
   assert.equal(header.bitDepth, 8, "8-bit channel depth");
