@@ -62,3 +62,43 @@ The 150/150 tally is not the same as 150 automated tests, and it does not indepe
 **Status: Acceptance evidence substantially complete; release approval pending.** The acceptance-hardening PR #5 was merged into `pixelartjs-new-ui-v1` after its CI run succeeded. This does not merge or modify `main`.
 
 The user-reported 150/150 result is strong manual evidence, but the outstanding gates above must be completed or explicitly waived before calling V1 fully accepted. This update does not merge into `pixelartjs-new-ui-v1` or `main`.
+
+
+## Supplemental regression update — 2026-11-15
+
+After the original 150/150 baseline, the user completed a further **41/41 reported PASS checks** across the following areas:
+
+| Follow-up area | Result |
+|---|---:|
+| Main workspace input validation | 8/8 |
+| Main workspace canvas preservation | 3/3 |
+| Hanoi of Colors boundaries and behavior | 6/6 |
+| Coordinate Placement vs Array Relocation | 5/5 |
+| PNG export regression | 5/5 |
+| JSON export regression | 5/5 |
+| Cross-platform regression | 4/4 |
+| Final functional regression and stability | 5/5 |
+| **Supplemental total** | **41/41** |
+
+The supplemental results include main-workspace input validation (blank, decimal, zero, negative, minimum 1, maximum 100, and above-maximum values), canvas preservation after invalid input, Hanoi 1×1/5×5/2×5 and invalid/reset/next-state checks, Visual Experiment tests through its actual 10×10 maximum, PNG/JSON regression at 1×1/3×3/2×5/5×2/100×100, Android and Windows workflow checks, cross-platform output equivalence, three-section navigation/isolation, and repeated-operation stability.
+
+**Counting rule:** These 41 checks overlap the original 150-check evidence categories. They are a supplemental test-session record and must not be added to 150 as 41 unique new acceptance requirements. The accurate statement is: original baseline 150/150 user-reported checks passed, followed by a supplemental session of 41/41 user-reported checks passed.
+
+## Updated outstanding release gates
+
+Completed by user-reported follow-up:
+- Main workspace input validation and preservation after invalid input.
+- Hanoi additional boundary, invalid-input, reset, and next-state checks.
+- Follow-up PNG and JSON export regression across five representative grid sizes.
+- Android and Windows functional workflow and output-equivalence checks.
+- Three-section reset/regeneration, navigation/isolation, and repeated-operation stability.
+
+Still open:
+- Record exact Android device model, Android version, browser/version, viewport, and tested build/commit.
+- Record exact Windows version, browser/version, viewport, and tested build/commit.
+- Independently inspect the actual PNG export files and record pixel dimensions.
+- Independently parse actual JSON export files and compare their complete contents with the source workspace.
+- Capture separate numerical performance measurements if quantitative performance certification is required.
+- Complete final release review and obtain explicit approval before any merge into `main`.
+
+All follow-up manual results remain user-reported evidence. No application source/runtime behavior was changed by this documentation update.
