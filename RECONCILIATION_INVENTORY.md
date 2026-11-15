@@ -65,13 +65,40 @@ This establishes that the archived file entries are not byte-identical to the cu
 - Identify only changes that could affect previously tested behavior before considering any targeted validation.
 - Exact tested commit SHAs were not captured at the time of the Windows and Android tests.
 
-## Remaining review work
+## Automated content audit results
 
-1. Extract and inspect the archive contents, including the additional RAR artifact.
-2. Compare full file contents and determine the actual source differences, beyond archive metadata and CRC fingerprints.
-3. Determine whether the Windows and Android archives are identical application builds with different packaging or contain platform-specific differences.
-4. Record the historical provenance as far as the available artifacts allow.
-5. Review the pull request before any merge.
+**Audit workflow:** [Run 4 — Legacy Download Reconciliation Audit](https://github.com/JasonScottCManalo12/ChatGPT-PixelArtJS-Test-1/actions/runs/43714065487)  
+**Result:** Success  
+**Audited commit:** `48a73eda5a2948f0389ffe90e53de1e6e5386977`  
+**Artifact:** `pixelartjs-legacy-reconciliation-report` (artifact ID `14161528994`, retained until 2026-12-15)
+
+The workflow successfully extracted both ZIP archives and the Windows RAR archive, computed SHA-256 hashes, and generated full text diffs. It inspected archives as data only and did not execute archived application code or tests.
+
+### File comparison
+
+| File | Android ZIP | Windows ZIP | Windows RAR |
+|---|---|---|---|
+| `index.html` | IDENTICAL | IDENTICAL | IDENTICAL |
+| `README.md` | DIFFERENT | DIFFERENT | DIFFERENT |
+| `TEST_PLAN.md` | DIFFERENT | DIFFERENT | DIFFERENT |
+| `tests/sequence.test.js` | DIFFERENT | DIFFERENT | DIFFERENT |
+
+The report contains 12 archive-entry comparisons: 3 IDENTICAL and 9 DIFFERENT. These counts include the same logical files repeated across the three archives; they are not 12 distinct project files.
+
+### Findings
+
+1. **Application source:** The archived `index.html` is byte-for-byte identical across Android ZIP, Windows ZIP, and Windows RAR, and matches the current branch's `index.html` exactly (SHA-256 `3823318f7dc24b09673fe1477c9195f61e0b49b49ef71ab83b06eacdfb8b59f5`).
+2. **Platform comparison:** The Android ZIP and Windows ZIP contain the same README, application HTML, and sequence test bytes. Their `TEST_PLAN.md` files differ. The Windows RAR matches the Windows ZIP on all four inspected files.
+3. **Test documentation:** The current branch's `TEST_PLAN.md` is substantially more complete than the archived copies. It consolidates the reported 150/150 manual checks, clarifies evidence limitations, and records the expanded test categories. The older Windows test plan is especially short; the Android test plan has a smaller earlier smoke-test record.
+4. **Automated sequence tests:** The current `sequence.test.js` expands the archived compact four-test suite to six tests, adds invariant checks for exhaustive 5- and 10-position sequences, and checks the first/final boundaries for a 10,000-position grid.
+5. **README:** The current README adds links to the consolidated acceptance report and test plan, CI details, and a clarification separating user-reported manual checks from automated verification.
+6. **No recovered application feature identified:** Within the four files present in these archives, no application HTML/source difference or platform-specific feature difference was found. The observed changes are documentation and automated-test evolution.
+
+### Remaining review work
+
+1. Record the best-available historical provenance; exact tested commit SHAs were not captured.
+2. Review the draft PR and decide whether to retain the archives and inventory as historical evidence.
+3. Do not merge without explicit user approval.
 
 No application source files have been changed by this reconciliation inventory. No merge is authorized by this document.
 
@@ -86,4 +113,4 @@ A dedicated GitHub Actions workflow has been added at `.github/workflows/legacy-
 - It compares extracted file bytes with the current `pixelartjs-new-ui-v1` checkout and produces a Markdown report, JSON results, and an uploaded workflow artifact.
 - It does not modify application source files or merge branches.
 
-The workflow definition is committed. An automated audit run has now been triggered by this inventory update; its completion and generated report remain to be verified.
+The workflow completed successfully on 2026-11-15. Run 4 and its report artifact are recorded above.
