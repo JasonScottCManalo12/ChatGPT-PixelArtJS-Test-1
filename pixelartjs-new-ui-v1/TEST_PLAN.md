@@ -155,7 +155,7 @@ The user reported all eight workflow steps passing on each platform:
 The manual results are strong evidence, but the following items remain open until separately verified:
 
 - [ ] Record exact Android device model, Android version, browser/version, viewport, and test date/build.
-- [ ] Record exact Windows version, browser/version, viewport, and test date/build.
+- [x] Record Windows version/build, browser/version, physical display resolution, viewport, and test date.
 - [ ] Re-run or capture the detailed manual evidence against a pinned commit so the tested artifact is unambiguous.
 - [ ] Test the main workspace's blank, decimal, zero, negative, and out-of-range dimension inputs individually, confirming visible feedback and no canvas mutation.
 - [ ] Test Hanoi of Colors at additional boundary dimensions (including 5×5), and separately verify invalid decimal/blank/out-of-range inputs.
@@ -199,4 +199,22 @@ The user inspected the local copy and supplied the contents of `README.md`, the 
 - No commit hash, build identifier, or embedded source revision was found in the supplied README or HTML excerpts. The exact tested application revision therefore remains **unknown**.
 - The four test cases inspected in the local copy are not a claim that the repository's expanded six-test suite was executed on the OPPO device.
 
-The recovered Android details close the previously open Android environment-identification item, but the exact tested commit/build and the Windows environment details remain outstanding. The manual results remain user-reported evidence; this addendum does not upgrade them to independently reproduced results.
+The recovered Android and Windows details close the previously open platform environment-identification items. The exact tested commit/build remains outstanding. The manual results remain user-reported evidence; this addendum does not upgrade them to independently reproduced results.
+
+
+## Recovered Windows test-environment details — 2026-11-15
+
+The user confirmed the Windows PC used for PixelArtJS testing and supplied the following environment details:
+
+| Field | Recovered value |
+|---|---|
+| Device | ASUS X542UAR |
+| Operating system | Windows 10 |
+| OS build | 19045.6466 |
+| Browser | Google Chrome |
+| Browser version | 157.0.8103.52 |
+| Physical display resolution | 1920 × 1080 pixels |
+| Browser viewport | 1084 × 738 CSS pixels |
+| Test date | 2026-11-15 |
+
+The Windows environment identification item is complete based on user-reported details. The exact application commit/build used for the Windows test has not yet been established. The environment record does not independently reproduce the manual test results or prove which source revision was tested.
