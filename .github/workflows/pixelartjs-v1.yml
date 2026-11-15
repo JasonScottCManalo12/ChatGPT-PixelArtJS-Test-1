@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - pixelartjs-new-ui-v1
+      - feature/v1-export-fixture-verification
   pull_request:
     branches:
       - pixelartjs-new-ui-v1
@@ -12,8 +13,8 @@ permissions:
   contents: read
 
 jobs:
-  sequence-tests:
-    name: Sequence invariants (Node.js)
+  v1-tests:
+    name: V1 sequence and export fixture checks (Node.js)
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
@@ -22,5 +23,5 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Run V1 sequence tests
-        run: node --test pixelartjs-new-ui-v1/tests/sequence.test.js
+      - name: Run V1 sequence and export fixture tests
+        run: node --test pixelartjs-new-ui-v1/tests/sequence.test.js pixelartjs-new-ui-v1/tests/export-fixtures.test.js
