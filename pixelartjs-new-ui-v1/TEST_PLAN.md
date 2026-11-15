@@ -145,6 +145,11 @@ The user reported all eight workflow steps passing on each platform:
 | Windows PC | 8/8 PASS |
 | **Total** | **16/16 PASS** |
 
+## Automated verification
+
+- [x] Expanded Node.js sequence suite: 6/6 tests passed locally on 2026-11-15.
+- [x] GitHub Actions workflow completed successfully for PR #5 targeting `pixelartjs-new-ui-v1` (run 43687470689).
+
 ## Remaining acceptance work / release gates
 
 The manual results are strong evidence, but the following items remain open until separately verified:
@@ -157,7 +162,7 @@ The manual results are strong evidence, but the following items remain open unti
 - [ ] Capture exact PNG pixel dimensions and inspect the exported PNG files directly for representative square, landscape, portrait, and 100×100 cases.
 - [ ] Independently parse exported JSON files and compare their complete contents to the corresponding workspace states.
 - [ ] Record measured load/render/export durations and memory observations separately for Android and Windows if quantitative performance acceptance is required.
-- [ ] Run the automated Node test suite and verify the new GitHub Actions check on the acceptance branch/PR.
+- [x] Run the automated Node test suite and verify the new GitHub Actions check on PR #5 — 6/6 tests passed; workflow run completed successfully.
 - [ ] Complete the release decision only after the remaining gates are either passed or explicitly waived.
 
 ## Acceptance boundary
