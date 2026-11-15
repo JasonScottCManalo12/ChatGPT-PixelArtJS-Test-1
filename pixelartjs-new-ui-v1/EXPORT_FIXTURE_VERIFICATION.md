@@ -44,8 +44,8 @@ node --test pixelartjs-new-ui-v1/tests/sequence.test.js pixelartjs-new-ui-v1/tes
 
 - These committed fixtures verify the empty initial state only. They do not independently verify non-empty PNG/JSON exports or prove the historical 150/150 manual test results.
 - The fixtures' exact source application commit/build is not recorded. Their presence in the repository does not establish which source revision generated them.
-- The verifier checks the decoded image data and structural PNG boundaries; it does not currently validate PNG chunk CRC checksums.
-- Populated-state fixtures (including representative sparse, dense, and full occupancy patterns) are still needed for broader export coverage.
+- The verifier validates PNG chunk CRC checksums in addition to decoded image data and structural PNG boundaries.
+- Populated-state fixtures (single occupied, asymmetric sparse, mixed density, dense, fully occupied, and large sparse) are still needed for broader export coverage. See `POPULATED_EXPORT_FIXTURE_CAPTURE.md` for the capture protocol.
 - Android and Windows test-environment details are documented in `TEST_PLAN.md`; the exact historical tested application revision remains unknown.
 
-**Status:** empty-state fixture verification implemented; automated CI result pending. No application runtime code is changed by this work.
+**Status:** empty-state fixture verification implemented; GitHub Actions run #25 and pull-request run #27 both passed before CRC validation was added. A fresh CI result is required for the CRC-enhanced verifier. Populated-state application-generated fixtures remain pending. No application runtime code is changed by this work.
