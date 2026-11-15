@@ -120,25 +120,40 @@ jobs:
           if rar_path.is_file():
               extract_dir = output / "rar-extracted"
               extract_dir.mkdir(parents=True, exist_ok=True)
-              result = subprocess.run(
-                  ["7zz", "x", "-y", f"-o{extract_dir}", str(rar_path)],
-                  text=True, capture_output=True,
+              import shutil
+              extractor = next(
+                  (shutil.which(candidate) for candidate in ("7zz", "7z", "7zzs")
+                   if shutil.which(candidate)),
+                  None,
               )
-              (output / "rar-extraction.log").write_text(
-                  result.stdout + "\n" + result.stderr, encoding="utf-8"
-              )
-              if result.returncode == 0:
-                  entries = {}
-                  for file in extract_dir.rglob("*"):
-                      if file.is_file():
-                          entries[file.relative_to(extract_dir).as_posix()] = file.read_bytes()
-                  compare("Windows RAR", entries)
-              elif extractor is not None:
+              if extractor is None:
                   summary["archives"]["Windows RAR"] = {
-                      "status": "EXTRACTION FAILED",
-                      "returncode": result.returncode,
+                      "status": "EXTRACTION TOOL UNAVAILABLE",
                   }
-              if extractor is None or result.returncode != 0:
+                  (output / "rar-extraction.log").write_text(
+                      "No supported 7-Zip executable found (tried 7zz, 7z, 7zzs).",
+                      encoding="utf-8",
+                  )
+              else:
+                  result = subprocess.run(
+                      [extractor, "x", "-y", f"-o{extract_dir}", str(rar_path)],
+                      text=True, capture_output=True,
+                  )
+                  (output / "rar-extraction.log").write_text(
+                      result.stdout + "\\n" + result.stderr, encoding="utf-8"
+                  )
+                  if result.returncode == 0:
+                      entries = {}
+                      for file in extract_dir.rglob("*"):
+                          if file.is_file():
+                              entries[file.relative_to(extract_dir).as_posix()] = file.read_bytes()
+                      compare("Windows RAR", entries)
+                  else:
+                      summary["archives"]["Windows RAR"] = {
+                          "status": "EXTRACTION FAILED",
+                          "returncode": result.returncode,
+                      }
+              if extractor is None or summary["archives"].get("Windows RAR", {}).get("status") == "EXTRACTION FAILED":
                   report.extend([
                       "## Windows RAR",
                       "",
