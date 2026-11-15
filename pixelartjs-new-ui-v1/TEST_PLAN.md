@@ -168,3 +168,39 @@ The manual results are strong evidence, but the following items remain open unti
 ## Acceptance boundary
 
 The 150/150 tally is user-reported manual acceptance evidence. Automated tests, source inspection, and CI checks are separate evidence classes. Do not label V1 fully released or merge into `main` solely from this tally. Version branches remain independent and pull requests are the required review boundary before changes enter a destination branch.
+
+
+## Independent GitHub export-artifact verification — 10/10 files PASS (2026-11-15)
+
+The five PNG and five JSON reference exports uploaded under `test-artifacts/export-verification/` were fetched from the V1 branch and inspected independently. This is a separate evidence class from the user's earlier manual export tests.
+
+### PNG artifacts — 5/5 PASS
+
+| Artifact | Expected rows × columns | Actual PNG width × height | Pixel count | Independent result |
+|---|---:|---:|---:|---|
+| `pixelartjs-1x1.png` | 1 × 1 | 1 × 1 | 1 | PASS |
+| `pixelartjs-3x3.png` | 3 × 3 | 3 × 3 | 9 | PASS |
+| `pixelartjs-2x5.png` | 2 × 5 | 5 × 2 | 10 | PASS |
+| `pixelartjs-5x2.png` | 5 × 2 | 2 × 5 | 10 | PASS |
+| `pixelartjs-100x100.png` | 100 × 100 | 100 × 100 | 10,000 | PASS |
+| **Total** | | | **10,030** | **5/5 files PASS** |
+
+- [x] All files decoded and their actual PNG dimensions checked.
+- [x] All 10,030 pixels were checked as opaque white RGBA `(255, 255, 255, 255)`.
+- [x] No unexpected pixel colors or dimension mismatches were found.
+- [x] Non-square PNG width/height correctly correspond to columns/rows, respectively.
+
+### JSON artifacts — 5/5 PASS
+
+- [x] All five files parsed as valid JSON.
+- [x] Each file contained the expected `rows`, `columns`, and `array_elements` fields.
+- [x] Each file's dimensions matched its named test configuration.
+- [x] Each `array_elements` value was an empty array, matching the empty-state PNG references.
+
+### Verification boundary
+
+**Independent export-artifact result: 10/10 files PASS (5 PNG + 5 JSON).** These artifacts represent empty-state reference exports only. This verification does not independently establish occupied-cell PNG color placement, non-empty JSON state serialization, every sequence state, or the complete export workflow on every platform.
+
+The application export implementation in `index.html` was also inspected: PNG output uses canvas width = columns and height = rows, paints a white background and paints occupied indices black; JSON output serializes `{ rows, columns, array_elements }`. Source inspection supports the interpretation of these reference artifacts but is not a substitute for additional non-empty-state export tests.
+
+The commit that uploaded the test artifacts is not automatically the application commit/build that produced them. The exact tested application commit/build remains to be pinned separately.
