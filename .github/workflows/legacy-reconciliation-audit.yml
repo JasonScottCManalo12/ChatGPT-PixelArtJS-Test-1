@@ -133,15 +133,16 @@ jobs:
                       if file.is_file():
                           entries[file.relative_to(extract_dir).as_posix()] = file.read_bytes()
                   compare("Windows RAR", entries)
-              else:
+              elif extractor is not None:
                   summary["archives"]["Windows RAR"] = {
                       "status": "EXTRACTION FAILED",
                       "returncode": result.returncode,
                   }
+              if extractor is None or result.returncode != 0:
                   report.extend([
                       "## Windows RAR",
                       "",
-                      f"Extraction failed (exit code {result.returncode}). See `rar-extraction.log`.",
+                      f"RAR extraction status: {summary['archives']['Windows RAR']['status']}. See `rar-extraction.log`.",
                       "",
                   ])
           else:
