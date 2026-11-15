@@ -32,7 +32,7 @@ The user reported using both Android and Windows PC.
 
 ## Evidence limitations
 
-The manual results are user-reported. They were not independently reproduced during this documentation update. Exact browser versions, Android device/OS details, Windows build, viewport sizes, and a pinned tested application commit were not recorded.
+The manual results are user-reported. They were not independently reproduced during this documentation update. Android and Windows device/OS details, browser versions, display resolutions, and viewport sizes have now been recovered and recorded. A pinned tested application commit remains unavailable.
 
 The 100×100 sequence test used sampled/targeted checks. It does not claim exhaustive traversal of the (2^{10000}) possible occupancy states.
 
@@ -49,7 +49,8 @@ The 150/150 tally is not the same as 150 automated tests, and it does not indepe
 
 ## Remaining release gates
 
-- Capture exact Android and Windows environment details and pin the tested application commit.
+- [x] Capture Android and Windows environment details, including OS/build, browser/version, display resolution, and viewport.
+- [ ] Pin or otherwise identify the tested application commit for each platform.
 - Individually verify blank, decimal, zero, negative, and out-of-range main-workspace dimension inputs.
 - Test Hanoi at additional boundary dimensions, including 5×5, and verify invalid blank/decimal values.
 - Independently inspect representative PNG files and parse/compare representative JSON exports.
@@ -94,3 +95,24 @@ The local README, HTML excerpts, and Node test source were inspected by the user
 - [ ] Record exact Windows version/build, browser/version, viewport, and test date.
 - [ ] Identify or reproduce the exact Android-tested application revision; commit/build remains unknown.
 - [ ] Pin the application revision for any new acceptance rerun and record its commit hash.
+
+
+## Documentation addendum — recovered Windows environment (2026-11-15)
+
+The user confirmed the Windows PC used for PixelArtJS V1 testing and provided these details:
+
+| Field | Recovered value |
+|---|---|
+| Device | ASUS X542UAR |
+| Operating system | Windows 10 |
+| OS build | 19045.6466 |
+| Browser | Google Chrome 157.0.8103.52 |
+| Physical display resolution | 1920 × 1080 pixels |
+| Browser viewport | 1084 × 738 CSS pixels |
+| Test date | 2026-11-15 |
+
+The Windows environment identification item is now complete based on user-reported information. Together with the Android addendum above, both platform environments are documented.
+
+### Remaining provenance limitation
+
+The exact application commit/build used for the Windows tests remains unknown. Recording the device and browser environment does not prove which repository revision was tested and does not independently reproduce the reported 150/150 manual results.
